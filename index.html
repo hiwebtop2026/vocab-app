@@ -48,7 +48,6 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 </head>
 <body>
 <div class="container">
-<!-- 首页 -->
 <div id="pageHome" class="page active">
 <div class="header"><h1>大英赛词汇学习</h1></div>
 <div style="padding:15px">
@@ -70,7 +69,6 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 </div>
 </div>
 
-<!-- 学习页 -->
 <div id="pageLearn" class="page">
 <div class="header"><h1>学习模式</h1><p>先听发音，再选择</p></div>
 <div style="padding:15px">
@@ -90,7 +88,6 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 </div>
 </div>
 
-<!-- 词库页 -->
 <div id="pageVocab" class="page">
 <div class="header"><h1>词汇库</h1></div>
 <div style="padding:15px">
@@ -99,7 +96,6 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 </div>
 </div>
 
-<!-- 测试页 -->
 <div id="pageQuiz" class="page">
 <div class="header"><h1>词汇测试</h1></div>
 <div style="padding:15px">
@@ -111,7 +107,6 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 </div>
 </div>
 
-<!-- 进度页 -->
 <div id="pageProgress" class="page">
 <div class="header"><h1>学习进度</h1></div>
 <div style="padding:15px">
@@ -127,7 +122,6 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 </div>
 </div>
 
-<!-- 设置页 -->
 <div id="pageSettings" class="page">
 <div class="header"><h1>系统设置</h1></div>
 <div style="padding:15px">
@@ -155,7 +149,6 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 </div>
 </div>
 
-<!-- 完成弹窗 -->
 <div class="modal" id="completeModal">
 <div class="modal-content">
 <div style="font-size:40px;margin-bottom:15px">完成!</div>
@@ -169,43 +162,33 @@ var vocab = [{"word": "abandon", "phonetic": "/əˈbændən/", "pos": "v.", "def
 var curWords = [], curIdx = 0, correct = 0, total = 0;
 var daily = 10;
 
-// 存储
 function getSet() { var s = localStorage.settings; return s ? JSON.parse(s) : {daily:10,review:3,options:4}; }
 function setSet(s) { localStorage.settings = JSON.stringify(s); }
-
-// 获取学习记录
 function getRecords() { var r = localStorage.records; return r ? JSON.parse(r) : []; }
 function saveRecords(records) { localStorage.records = JSON.stringify(records); }
 
-// 添加学习记录
 function addRecord(word, known) {
   var records = getRecords();
   var today = new Date().toISOString().split("T")[0];
   records.push({word:word, known:known, date:today, time:new Date().toISOString()});
-  // 只保留最近100条
   if (records.length > 100) records = records.slice(-100);
   saveRecords(records);
   updateLearnedCount();
 }
 
-// 更新已学习数量
 function updateLearnedCount() {
   var records = getRecords();
   var unique = {};
-  for (var i = 0; i < records.length; i++) {
-    unique[records[i].word] = true;
-  }
+  for (var i = 0; i < records.length; i++) { unique[records[i].word] = true; }
   document.getElementById("learnedNum").textContent = Object.keys(unique).length;
 }
 
-// 页面切换
 function showPage(id) {
   document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")});
   document.getElementById(id).classList.add("active");
   if (id === "pageProgress") renderRecords();
 }
 
-// 初始化
 function init() {
   var s = getSet();
   daily = s.daily;
@@ -217,7 +200,6 @@ function init() {
   showPage("pageHome");
 }
 
-// 设置
 document.getElementById("saveSet").onclick = function() {
   var s = {daily:parseInt(document.getElementById("setDaily").value)||10,review:parseInt(document.getElementById("setReview").value)||3,options:parseInt(document.getElementById("setOptions").value)||4};
   setSet(s);
@@ -226,7 +208,6 @@ document.getElementById("saveSet").onclick = function() {
   alert("设置已保存");
 };
 
-// 导航
 document.getElementById("toVocab").onclick = function() { showPage("pageVocab"); renderVocab(); };
 document.getElementById("toQuiz").onclick = function() { startQuiz(); };
 document.getElementById("toProgress").onclick = function() { showPage("pageProgress"); };
@@ -235,7 +216,6 @@ document.getElementById("backHome").onclick = function() { showPage("pageHome");
 document.getElementById("backHome2").onclick = function() { showPage("pageHome"); };
 document.getElementById("closeModal").onclick = function() { document.getElementById("completeModal").classList.remove("active"); showPage("pageHome"); };
 
-// 学习
 document.getElementById("startLearn").onclick = function() {
   var s = getSet();
   var cnt = s.daily;
@@ -270,53 +250,33 @@ document.getElementById("speakBtn").onclick = function() {
   var w = curWords[curIdx];
   if (window.speechSynthesis) {
     var utt = new SpeechSynthesisUtterance(w.word);
-    utt.lang = "en-US";
-    utt.rate = 0.8;
+    utt.lang = "en-US"; utt.rate = 0.8;
     window.speechSynthesis.speak(utt);
   }
-  // 显示选项按钮
   document.getElementById("answerBtns").classList.add("show");
 };
 
-// 选择后显示意思并保存记录
 function doAnswer(known) {
   var w = curWords[curIdx];
-  // 保存学习记录
   addRecord(w.word, known);
-  
-  // 显示意思
   document.getElementById("defText").textContent = w.definition;
   document.getElementById("defText").classList.add("show");
-  
-  // 延迟进入下一个
-  setTimeout(function() {
-    curIdx++;
-    showWord();
-  }, 1000);
+  setTimeout(function() { curIdx++; showWord(); }, 1000);
 }
 
 document.getElementById("btnNo").onclick = function() { doAnswer(false); };
 document.getElementById("btnYes").onclick = function() { doAnswer(true); };
 
-// 词库
 function renderVocab() {
   var f = document.getElementById("searchBox").value;
   var ws = vocab;
-  if (f) { 
-    ws = []; 
-    for (var i = 0; i < vocab.length; i++) { 
-      if (vocab[i].word.indexOf(f) !== -1 || vocab[i].definition.indexOf(f) !== -1) ws.push(vocab[i]); 
-    } 
-  }
+  if (f) { ws = []; for (var i = 0; i < vocab.length; i++) { if (vocab[i].word.indexOf(f) !== -1 || vocab[i].definition.indexOf(f) !== -1) ws.push(vocab[i]); } }
   var html = "";
-  for (var i = 0; i < Math.min(ws.length, 100); i++) { 
-    html += "<div class='item'><span>" + ws[i].word + "</span><span style='color:#888'>" + ws[i].definition + "</span></div>"; 
-  }
+  for (var i = 0; i < Math.min(ws.length, 100); i++) { html += "<div class='item'><span>" + ws[i].word + "</span><span style='color:#888'>" + ws[i].definition + "</span></div>"; }
   document.getElementById("vocabList").innerHTML = html;
 }
 document.getElementById("searchBox").oninput = renderVocab;
 
-// 测试
 function startQuiz() {
   var s = getSet();
   var cnt = s.daily;
@@ -356,18 +316,15 @@ function showQuiz(opt) {
       var known = e.target.getAttribute("data") === w.definition;
       if (known) correct++;
       total++;
-      // 保存记录
       addRecord(w.word, known);
       curIdx++; showQuiz(opt);
     }
   };
 }
 
-// 显示学习记录
 function renderRecords() {
   var records = getRecords();
   var html = "";
-  // 显示最近10条
   var recent = records.slice(-10).reverse();
   for (var i = 0; i < recent.length; i++) {
     var r = recent[i];
@@ -377,16 +334,13 @@ function renderRecords() {
   if (!html) html = "<div style='padding:15px;color:#888;text-align:center'>暂无学习记录</div>";
   document.getElementById("recentRecords").innerHTML = html;
   
-  // 更新进度条
-  var total = vocab.length;
+  var totalV = vocab.length;
   var learned = {};
-  for (var i = 0; i < records.length; i++) {
-    learned[records[i].word] = true;
-  }
+  for (var i = 0; i < records.length; i++) { learned[records[i].word] = true; }
   var count = Object.keys(learned).length;
-  var pct = Math.round(count / total * 100);
+  var pct = Math.round(count / totalV * 100);
   document.getElementById("progBar").style.width = pct + "%";
-  document.getElementById("progText").textContent = count + "/" + total + " (" + pct + "%)";
+  document.getElementById("progText").textContent = count + "/" + totalV + " (" + pct + "%)";
 }
 
 init();
