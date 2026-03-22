@@ -26,7 +26,7 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 .stat{background:white;padding:15px 10px;border-radius:12px;text-align:center}
 .stat-num{font-size:24px;font-weight:bold;color:#667eea}
 .stat-label{font-size:12px;color:#888}
-.word{font-size:40px;font-weight:bold;text-align:center;margin:20px 0;line-height:1.2}
+.word{font-size:35px;font-weight:bold;text-align:center;margin:20px 0;line-height:1.2}
 .phonetic{font-size:18px;color:#888;text-align:center;margin-bottom:10px}
 .pos{font-size:16px;color:#667eea;margin-bottom:10px}
 .definition{font-size:24px;color:#333;text-align:center;margin:15px 0;min-height:30px;display:none}
@@ -47,7 +47,8 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;z-index:200}
 .modal.active{display:flex}
 .modal-content{background:white;padding:30px;border-radius:16px;text-align:center;width:80%}
-.quiz-opt{padding:15px;background:#f5f7fa;border-radius:8px;margin-bottom:10px;text-align:center;font-size:18px;cursor:pointer}
+#quizQuestion{font-size:25px;font-weight:bold;text-align:center;margin:15px 0}
+.quiz-opt{padding:15px;background:#f5f7fa;border-radius:8px;margin-bottom:10px;text-align:center;font-size:20px;cursor:pointer}
 .quiz-opt:hover{background:#e8e8e8}
 .quiz-opt.correct{background:#d4edda;color:#155724;border:2px solid #28a745}
 .quiz-opt.wrong{background:#f8d7da;color:#721c24;border:2px solid #dc3545}
@@ -85,6 +86,9 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
       <h2>用户登录</h2>
       <input type="text" id="loginUsername" placeholder="用户名">
       <input type="password" id="loginPassword" placeholder="密码">
+      <label style="display:block;margin:10px 0;font-size:14px;color:#666;cursor:pointer">
+        <input type="checkbox" id="rememberPwd" style="vertical-align:middle;margin-right:5px"> 记住密码
+      </label>
       <button class="btn btn-primary" id="doLogin">登录</button>
       <div style="font-size:12px;text-align:center;margin-top:10px;color:#888">管理员初始账号: admin / 123456</div>
     </div>
@@ -241,6 +245,23 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
           </div>
         </div>
         <div class="card">
+          <h3>修改密码</h3>
+          <div class="setting">
+            <label>当前密码</label>
+            <input type="password" id="currentPwd" placeholder="请输入当前密码" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px">
+          </div>
+          <div class="setting">
+            <label>新密码</label>
+            <input type="password" id="userNewPwd" placeholder="请输入新密码" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px">
+          </div>
+          <div class="setting">
+            <label>确认新密码</label>
+            <input type="password" id="userConfirmPwd" placeholder="请再次输入新密码" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px">
+          </div>
+          <button class="btn btn-warning" id="changePwdBtn" style="width:100%">修改密码</button>
+        </div>
+
+        <div class="card">
           <h3>学习设置</h3>
           <div class="setting">
             <label>每日新词数</label>
@@ -261,7 +282,29 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
     </div>
 
     <!-- 管理员管理页面 -->
-    <div id="pageAdmin" class="page">
+    <!-- 查看学习记录模态框 -->
+  <div id="pageRecords" class="page" style="display:none">
+    <div class="header">
+      <button onclick="showPage(\'pageAdmin\')" style="float:left;background:none;border:none;color:white;font-size:20px">←返回</button>
+      <h1 id="recordsTitle">学习记录</h1>
+    </div>
+    <div style="padding:15px">
+      <div style="margin-bottom:15px">
+        <select id="recordUserSelect" style="padding:10px;font-size:16px;width:100%;margin-bottom:10px">
+        </select>
+        <select id="recordTypeSelect" style="padding:10px;font-size:16px;width:100%;margin-bottom:10px">
+          <option value="all">全部记录</option>
+          <option value="login">登录记录</option>
+          <option value="learning">学习记录</option>
+        </select>
+        <button id="queryRecordsBtn" class="btn btn-primary" style="width:100%">查询</button>
+      </div>
+      <div id="recordsContent" style="background:white;padding:10px;border-radius:8px;max-height:400px;overflow-y:auto">
+      </div>
+    </div>
+  </div>
+
+  <div id="pageAdmin" class="page">
       <div class="header"><h1>用户管理</h1></div>
       <div style="padding:15px">
         <div class="card">
@@ -274,6 +317,7 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
           <h3>现有用户</h3>
           <div id="userList" class="user-list"></div>
         </div>
+        <button class="btn btn-info" id="viewRecordsBtn" style="margin-top:15px">查看学习记录</button>
         <button class="btn btn-secondary" id="backHomeAdmin" style="margin-top:15px">返回首页</button>
       </div>
     </div>
@@ -37067,12 +37111,13 @@ var defaultVocabSets = {
 
 // 加载或初始化词汇集存储
 function loadVocabSets() {
+  // 优先从localStorage加载，如果不存在则使用默认词汇
   var saved = localStorage.getItem('vocabSets');
   if (saved) {
     return JSON.parse(saved);
   } else {
     localStorage.setItem('vocabSets', JSON.stringify(defaultVocabSets));
-    return JSON.parse(JSON.stringify(defaultVocabSets)); // 深拷贝
+    return JSON.parse(JSON.stringify(defaultVocabSets));
   }
 }
 function saveVocabSets(sets) {
@@ -37093,9 +37138,9 @@ function userVocabKey(prefix) {
   return prefix + '_' + currentUser + '_' + currentVocabName;
 }
 function getSet() {
-  if (!currentUser || !currentVocabName) return {daily:10,review:3,options:4};
+  if (!currentUser || !currentVocabName) return {daily:10,review:3,options:3};
   var s = localStorage.getItem(userVocabKey('settings'));
-  return s ? JSON.parse(s) : {daily:10,review:3,options:4};
+  return s ? JSON.parse(s) : {daily:10,review:3,options:3};
 }
 function setSet(s) {
   if (!currentUser || !currentVocabName) return;
@@ -37165,9 +37210,37 @@ function recordLogin(username) {
   var users = loadUsers();
   var user = users[username];
   if (!user) return;
-  user.loginHistory.unshift({ time: new Date().toISOString() });
-  if (user.loginHistory.length > 20) user.loginHistory.pop();
+  user.loginHistory = user.loginHistory || [];
+  user.loginHistory.unshift({ time: new Date().toISOString(), type: 'login' });
+  if (user.loginHistory.length > 50) user.loginHistory.pop();
   saveUsers(users);
+}
+
+// 记录学习活动
+function recordLearning(action, details) {
+  var users = loadUsers();
+  var user = users[currentUser];
+  if (!user || !currentUser) return;
+  user.learningHistory = user.learningHistory || [];
+  user.learningHistory.unshift({
+    time: new Date().toISOString(),
+    action: action,
+    details: details || ''
+  });
+  if (user.learningHistory.length > 100) user.learningHistory.pop();
+  saveUsers(users);
+}
+
+// 获取用户学习记录
+function getUserLearningHistory(username) {
+  var users = loadUsers();
+  return users[username] ? (users[username].learningHistory || []) : [];
+}
+
+// 获取用户登录历史
+function getUserLoginHistory(username) {
+  var users = loadUsers();
+  return users[username] ? (users[username].loginHistory || []) : [];
 }
 function updateTotalDuration(seconds) {
   if (!currentUser) return;
@@ -37215,10 +37288,19 @@ function renderLoginHistoryAndDuration() {
 function loadUsers() {
   var u = localStorage.getItem('users');
   if (u) {
+    // 用户已存在，保留现有用户数据不重置
     var users = JSON.parse(u);
-    for (var name in users) {
-      if (!users[name].loginHistory) users[name].loginHistory = [];
-      if (typeof users[name].totalDuration !== 'number') users[name].totalDuration = 0;
+    // 如果admin用户不存在，则创建
+    if (!users["admin"]) {
+      users["admin"] = {
+        password: btoa("123456"),
+        isAdmin: true,
+        mustChangePwd: true,
+        loginHistory: [],
+        totalDuration: 0,
+        lastVocab: "英语六级词汇"
+      };
+      localStorage.setItem('users', JSON.stringify(users));
     }
     return users;
   } else {
@@ -37280,6 +37362,12 @@ function logout() {
   currentUser = null;
   currentUserInfo = null;
   localStorage.removeItem('currentUser');
+  // 清除记住的密码
+  localStorage.removeItem('savedUsername');
+  localStorage.removeItem('savedPassword');
+  document.getElementById("loginUsername").value = "";
+  document.getElementById("loginPassword").value = "";
+  document.getElementById("rememberPwd").checked = false;
   document.getElementById("appContainer").style.display = "none";
   document.getElementById("pageLogin").style.display = "block";
   document.getElementById("pageLogin").classList.add("active");
@@ -37798,6 +37886,48 @@ function bindEvents() {
     renderUserList();
     showPage("pageAdmin");
   };
+  // 管理员查看学习记录按钮
+  document.getElementById("viewRecordsBtn").onclick = () => {
+    showRecordsPage();
+  };
+  
+  // 用户修改密码按钮
+  document.getElementById("changePwdBtn").onclick = () => {
+    var currentPwd = document.getElementById("currentPwd").value;
+    var newPwd = document.getElementById("userNewPwd").value;
+    var confirmPwd = document.getElementById("userConfirmPwd").value;
+    
+    if (!currentPwd || !newPwd || !confirmPwd) {
+      alert("请填写所有密码字段");
+      return;
+    }
+    if (newPwd !== confirmPwd) {
+      alert("两次输入的新密码不一致");
+      return;
+    }
+    if (newPwd.length < 3) {
+      alert("新密码长度至少3个字符");
+      return;
+    }
+    
+    var users = loadUsers();
+    var user = users[currentUser];
+    if (!checkPassword(currentPwd, user.password)) {
+      alert("当前密码错误");
+      return;
+    }
+    
+    // 更新密码
+    user.password = encrypt(newPwd);
+    user.mustChangePwd = false;
+    saveUsers(users);
+    
+    alert("密码修改成功");
+    document.getElementById("currentPwd").value = "";
+    document.getElementById("userNewPwd").value = "";
+    document.getElementById("userConfirmPwd").value = "";
+  };
+  
   document.getElementById("backHomeAdmin").onclick = () => showPage("pageHome");
   document.getElementById("addUserBtn").onclick = () => {
     var un = document.getElementById("newUserName").value.trim();
@@ -37821,9 +37951,32 @@ function init() {
   document.getElementById("doLogin").onclick = () => {
     var un = document.getElementById("loginUsername").value.trim();
     var pwd = document.getElementById("loginPassword").value;
-    if (un && pwd) login(un, pwd);
-    else alert("请输入用户名和密码");
+    var remember = document.getElementById("rememberPwd").checked;
+    if (un && pwd) {
+      // 保存密码功能
+      if (remember) {
+        localStorage.setItem('savedUsername', un);
+        localStorage.setItem('savedPassword', btoa(pwd));
+      } else {
+        localStorage.removeItem('savedUsername');
+        localStorage.removeItem('savedPassword');
+      }
+      login(un, pwd);
+    } else {
+      alert("请输入用户名和密码");
+    }
   };
+  
+  // 页面加载时自动填充已保存的账号密码
+  (function() {
+    var savedUser = localStorage.getItem('savedUsername');
+    var savedPwd = localStorage.getItem('savedPassword');
+    if (savedUser) document.getElementById("loginUsername").value = savedUser;
+    if (savedPwd) {
+      document.getElementById("loginPassword").value = atob(savedPwd);
+      document.getElementById("rememberPwd").checked = true;
+    }
+  })();
   document.getElementById("confirmChangePwd").onclick = () => {
     var pwd1 = document.getElementById("newPwd").value;
     var pwd2 = document.getElementById("confirmPwd").value;
@@ -37836,6 +37989,63 @@ function init() {
   document.getElementById("logoutBtn").onclick = logout;
   bindEvents();
 }
+// 显示学习记录页面
+function showRecordsPage() {
+  var users = loadUsers();
+  var select = document.getElementById("recordUserSelect");
+  select.innerHTML = "";
+  for (var name in users) {
+    var opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name + (users[name].isAdmin ? " (管理员)" : "");
+    select.appendChild(opt);
+  }
+  document.getElementById("recordTypeSelect").value = "all";
+  document.getElementById("recordsContent").innerHTML = "<p style=\'text-align:center;color:#888\'>点击查询按钮查看记录</p>";
+  showPage("pageRecords");
+}
+
+// 查询记录
+function queryRecords() {
+  var username = document.getElementById("recordUserSelect").value;
+  var recordType = document.getElementById("recordTypeSelect").value;
+  var users = loadUsers();
+  var user = users[username];
+  if (!user) return;
+  
+  var records = [];
+  if (recordType === "all" || recordType === "login") {
+    var loginHist = user.loginHistory || [];
+    loginHist.forEach(function(r) {
+      records.push({time: r.time, type: "登录", detail: new Date(r.time).toLocaleString()});
+    });
+  }
+  if (recordType === "all" || recordType === "learning") {
+    var learnHist = user.learningHistory || [];
+    learnHist.forEach(function(r) {
+      records.push({time: r.time, type: r.action === 'answer' ? '答题' : '学习', detail: r.details});
+    });
+  }
+  
+  // 按时间排序
+  records.sort(function(a, b) { return new Date(b.time) - new Date(a.time); });
+  
+  var html = "";
+  if (records.length === 0) {
+    html = "<p style=\'text-align:center;color:#888\'>暂无记录</p>";
+  } else {
+    records.forEach(function(r) {
+      html += "<div style=\'padding:10px;border-bottom:1px solid #eee\'>";
+      html += "<div style=\'color:#667eea;font-weight:bold\'>" + r.type + "</div>";
+      html += "<div style=\'color:#888;font-size:12px\'>" + new Date(r.time).toLocaleString() + "</div>";
+      if (r.detail) html += "<div style=\'margin-top:5px\'>" + r.detail + "</div>";
+      html += "</div>";
+    });
+  }
+  
+  document.getElementById("recordsContent").innerHTML = html;
+}
+
 init();
 </script>
 </body>
