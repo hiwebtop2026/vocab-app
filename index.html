@@ -25,10 +25,10 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 .stat{background:white;padding:15px 10px;border-radius:12px;text-align:center}
 .stat-num{font-size:24px;font-weight:bold;color:#667eea}
 .stat-label{font-size:12px;color:#888}
-.word{font-size:32px;font-weight:bold;text-align:center;margin:20px 0}
-.phonetic{font-size:16px;color:#888;text-align:center;margin-bottom:10px}
-.pos{font-size:14px;color:#667eea;margin-bottom:10px}
-.definition{font-size:20px;color:#333;text-align:center;margin:15px 0;min-height:30px;display:none}
+.word{font-size:40px;font-weight:bold;text-align:center;margin:20px 0;line-height:1.2}
+.phonetic{font-size:18px;color:#888;text-align:center;margin-bottom:10px}
+.pos{font-size:16px;color:#667eea;margin-bottom:10px}
+.definition{font-size:24px;color:#333;text-align:center;margin:15px 0;min-height:30px;display:none}
 .definition.show{display:block}
 .btns{display:none;gap:10px;margin-top:20px}
 .btns.show{display:flex}
@@ -46,17 +46,17 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;z-index:200}
 .modal.active{display:flex}
 .modal-content{background:white;padding:30px;border-radius:16px;text-align:center;width:80%}
-.quiz-opt{padding:12px;background:#f5f7fa;border-radius:8px;margin-bottom:10px;text-align:center;font-size:14px;cursor:pointer}
+.quiz-opt{padding:15px;background:#f5f7fa;border-radius:8px;margin-bottom:10px;text-align:center;font-size:18px;cursor:pointer}
 .quiz-opt:hover{background:#e8e8e8}
 .quiz-opt.correct{background:#d4edda;color:#155724;border:2px solid #28a745}
 .quiz-opt.wrong{background:#f8d7da;color:#721c24;border:2px solid #dc3545}
-.quiz-type-btn{padding:10px;margin-bottom:10px;border-radius:8px;border:2px solid #ddd;cursor:pointer;background:white;transition:all 0.3s}
+.quiz-type-btn{padding:12px;margin-bottom:10px;border-radius:8px;border:2px solid #ddd;cursor:pointer;background:white;transition:all 0.3s;font-size:16px}
 .quiz-type-btn.active{border-color:#667eea;background:#667eea;color:white}
 .mistake-item{padding:12px 15px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;background:#fff3cd}
 .record-item{padding:12px 15px;border-bottom:1px solid #f0f0f0;background:white}
-.record-date{font-weight:bold;color:#667eea;margin-bottom:5px}
-.record-detail{font-size:12px;color:#888}
-.record-rate{font-size:18px;font-weight:bold;margin:5px 0}
+.record-date{font-weight:bold;color:#667eea;margin-bottom:5px;font-size:16px}
+.record-detail{font-size:14px;color:#888}
+.record-rate{font-size:22px;font-weight:bold;margin:5px 0}
 .rate-high{color:#5cb85c}
 .rate-medium{color:#f0ad4e}
 .rate-low{color:#d9534f}
@@ -107,7 +107,7 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
 <div id="pageVocab" class="page">
 <div class="header"><h1>词汇库</h1></div>
 <div style="padding:15px">
-<input type="text" id="searchBox" placeholder="搜索单词..." style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-bottom:15px">
+<input type="text" id="searchBox" placeholder="搜索单词..." style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-bottom:15px;font-size:16px">
 <div class="list" id="vocabList"></div>
 </div>
 </div>
@@ -17569,7 +17569,6 @@ function renderRecords() {
   var today = new Date().toISOString().split("T")[0];
   var todayRecords = records.filter(function(r) { return r.date === today; });
   
-  // Today's records
   var todayHtml = "";
   if (todayRecords.length === 0) {
     todayHtml = "<div style='padding:15px;color:#888;text-align:center'>今日暂无学习记录</div>";
@@ -17584,7 +17583,6 @@ function renderRecords() {
   }
   document.getElementById("todayRecords").innerHTML = todayHtml;
   
-  // Recent records
   var recentHtml = "";
   var recent = records.slice(-20).reverse();
   for (var i = 0; i < recent.length; i++) {
