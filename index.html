@@ -404,7 +404,7 @@ body {
     border-bottom: 1px solid #f0f0f0;
 }
 
-/* ========== 黑夜模式样式（增强测验对比度） ========== */
+/* ========== 黑夜模式样式（优化测验配色） ========== */
 .dark-mode body {
     background: linear-gradient(135deg, #1e293b, #0f172a);
 }
@@ -487,26 +487,32 @@ body {
     border-color: #475569;
     color: #f1f5f9;
 }
-/* 测验选项 - 增强对比度 */
+/* 测验题目文字：暗绿色 */
+.dark-mode #quizQuestion {
+    color: #2e7d32;  /* 深绿 */
+    font-weight: 600;
+}
+/* 测验选项：浅紫色背景 + 米色文字 */
 .dark-mode .quiz-opt {
-    background: #2d3a4e;
-    border: 1px solid #475569;
-    color: #f1f5f9;
+    background: #8b5cf6;  /* 浅紫色 */
+    color: #fef9c3;       /* 米色 */
+    border: none;
     font-weight: 500;
 }
 .dark-mode .quiz-opt:hover {
-    background: #3b4a62;
+    background: #a78bfa;
     transform: scale(0.98);
 }
+/* 正确/错误状态保持高对比 */
 .dark-mode .quiz-opt.correct {
-    background: #065f46;
-    border-color: #10b981;
+    background: #10b981;
     color: white;
+    border: 1px solid #34d399;
 }
 .dark-mode .quiz-opt.wrong {
-    background: #991b1b;
-    border-color: #ef4444;
+    background: #ef4444;
     color: white;
+    border: 1px solid #f87171;
 }
 .dark-mode .quiz-type-btn {
     background: #1e293b;
@@ -697,7 +703,7 @@ body {
       <div class="card"><h3>最近学习动态</h3><div id="recentRecords2"></div></div>
     </div>
 
-    <!-- 设置页面（移除了黑夜模式开关，改为全局） -->
+    <!-- 设置页面 -->
     <div id="pageSettings" class="page">
       <div class="header"><h1>系统设置</h1></div>
       <div class="card">
