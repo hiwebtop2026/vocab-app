@@ -1,100 +1,567 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>大英赛词汇学习 - 多词汇集版</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+<title>大英赛词汇学习 - 多词汇集版（自动朗读+黑夜模式）</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh}
-.container{max-width:430px;margin:0 auto;background:#f5f7fa;min-height:100vh}
-.header{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:20px 15px}
-.header .user-info{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:14px}
-.user-info span{background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:20px}
-.user-info button{background:white;border:none;padding:4px 12px;border-radius:20px;color:#667eea;font-weight:bold;cursor:pointer;margin-left:8px}
-.page{display:none;padding:15px}
-.page.active{display:block}
-.card{background:white;padding:25px 20px;border-radius:16px;text-align:center;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
-.card h3{font-size:18px;margin-bottom:15px}
-.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer}
-.btn-primary{background:#667eea;color:white}
-.btn-danger{background:#d9534f;color:white}
-.btn-success{background:#5cb85c;color:white}
-.btn-secondary{background:#95a5a6;color:white}
-.btn-warning{background:#f0ad4e;color:white}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.stat{background:white;padding:15px 10px;border-radius:12px;text-align:center}
-.stat-num{font-size:24px;font-weight:bold;color:#667eea}
-.stat-label{font-size:12px;color:#888}
-.word{font-size:35px;font-weight:bold;text-align:center;margin:20px 0;line-height:1.2}
-.phonetic{font-size:18px;color:#888;text-align:center;margin-bottom:10px}
-.pos{font-size:16px;color:#667eea;margin-bottom:10px}
-.definition{font-size:24px;color:#333;text-align:center;margin:15px 0;min-height:30px;display:none}
-.definition.show{display:block}
-.btns{display:none;gap:10px;margin-top:20px}
-.btns.show{display:flex}
-.btns .btn{flex:1}
-.progress{background:#e0e0e0;height:8px;border-radius:10px;margin-bottom:20px}
-.progress-bar{background:#667eea;height:100%;border-radius:10px;width:0%;transition:width 0.3s}
-.nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:10px;box-shadow:0 -2px 10px rgba(0,0,0,0.1)}
-.nav-item{text-align:center;color:#888;font-size:12px;cursor:pointer;flex:1}
-.nav-item.active{color:#667eea}
-.item{padding:12px 15px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
-.list{background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);max-height:60vh;overflow-y:auto}
-.setting{background:white;padding:15px;margin-bottom:10px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-.setting label{display:block;font-size:14px;margin-bottom:5px}
-.setting input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px}
-.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;z-index:200}
-.modal.active{display:flex}
-.modal-content{background:white;padding:30px;border-radius:16px;text-align:center;width:80%}
-#quizQuestion{font-size:25px;font-weight:bold;text-align:center;margin:15px 0}
-.quiz-opt{padding:15px;background:#f5f7fa;border-radius:8px;margin-bottom:10px;text-align:center;font-size:20px;cursor:pointer}
-.quiz-opt:hover{background:#e8e8e8}
-.quiz-opt.correct{background:#d4edda;color:#155724;border:2px solid #28a745}
-.quiz-opt.wrong{background:#f8d7da;color:#721c24;border:2px solid #dc3545}
-.quiz-type-btn{padding:12px;margin-bottom:10px;border-radius:8px;border:2px solid #ddd;cursor:pointer;background:white;transition:all 0.3s;font-size:16px}
-.quiz-type-btn.active{border-color:#667eea;background:#667eea;color:white}
-.mistake-item{padding:12px 15px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;background:#fff3cd}
-.record-item{padding:12px 15px;border-bottom:1px solid #f0f0f0;background:white}
-.record-date{font-weight:bold;color:#667eea;margin-bottom:5px;font-size:16px}
-.record-detail{font-size:14px;color:#888}
-.record-rate{font-size:22px;font-weight:bold;margin:5px 0}
-.rate-high{color:#5cb85c}
-.rate-medium{color:#f0ad4e}
-.rate-low{color:#d9534f}
-.login-box, .pwd-box{background:white;border-radius:16px;padding:30px 20px;margin:30px 15px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
-.login-box input, .pwd-box input{width:100%;padding:12px;margin-bottom:15px;border:1px solid #ddd;border-radius:8px;font-size:16px}
-.login-box .btn, .pwd-box .btn{margin-top:10px}
-.login-box h2, .pwd-box h2{text-align:center;margin-bottom:20px;color:#667eea}
-.user-list{max-height:400px;overflow-y:auto}
-.user-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee}
-.user-item button{margin-left:10px;padding:4px 12px}
-.stat-row{display:flex;justify-content:space-between;margin-top:10px;font-size:14px}
-.stat-row span:first-child{color:#888}
-.stat-row span:last-child{font-weight:bold;color:#667eea}
-.login-history{text-align:left;max-height:200px;overflow-y:auto;margin-top:10px}
-.login-history div{padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:12px}
-.current-vocab{background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:20px;margin-top:8px;display:inline-block;font-size:12px}
+/* ========== 基础样式 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'PingFang SC', 'Helvetica Neue', Roboto, system-ui, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.2s;
+}
+.container {
+    max-width: 450px;
+    margin: 0 auto;
+    background: #f5f7fa;
+    min-height: 100vh;
+    transition: background 0.3s;
+}
+/* 头部样式，支持右上角按钮 */
+.header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 20px 16px;
+    transition: background 0.3s;
+    position: relative;
+}
+.header .title-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+.dark-mode-toggle {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+.dark-mode-toggle:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+}
+.user-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 14px;
+}
+.user-info span {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 30px;
+}
+.user-info button {
+    background: white;
+    border: none;
+    padding: 5px 14px;
+    border-radius: 30px;
+    color: #667eea;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-left: 8px;
+}
+.user-info button:hover {
+    opacity: 0.9;
+    transform: scale(0.98);
+}
+.current-vocab {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 12px;
+}
+.page {
+    display: none;
+    padding: 16px;
+}
+.page.active {
+    display: block;
+}
+.card {
+    background: white;
+    padding: 24px 20px;
+    border-radius: 24px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 40px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-primary { background: #667eea; color: white; }
+.btn-danger { background: #ef4444; color: white; }
+.btn-success { background: #10b981; color: white; }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-warning { background: #f59e0b; color: white; }
+.btn-info { background: #3b82f6; color: white; }
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.stat {
+    background: white;
+    padding: 16px 8px;
+    border-radius: 24px;
+    text-align: center;
+    transition: background 0.2s;
+}
+.stat-num {
+    font-size: 28px;
+    font-weight: bold;
+    color: #667eea;
+}
+.stat-label {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+.word {
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin: 20px 0 10px;
+    word-break: break-word;
+}
+.phonetic {
+    font-size: 16px;
+    color: #888;
+    text-align: center;
+    margin-bottom: 8px;
+}
+.pos {
+    font-size: 14px;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+.definition {
+    font-size: 22px;
+    color: #2c3e50;
+    text-align: center;
+    margin: 20px 0;
+    min-height: 60px;
+    display: none;
+    font-weight: 500;
+}
+.definition.show {
+    display: block;
+}
+.btns {
+    display: none;
+    gap: 12px;
+    margin-top: 24px;
+}
+.btns.show {
+    display: flex;
+}
+.progress {
+    background: #e2e8f0;
+    height: 8px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.progress-bar {
+    background: #667eea;
+    height: 100%;
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.3s;
+}
+.nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 450px;
+    margin: 0 auto;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 10px;
+    box-shadow: 0 -2px 15px rgba(0,0,0,0.08);
+    border-top: 1px solid #edf2f7;
+    transition: background 0.2s, border-color 0.2s;
+}
+.nav-item {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 12px;
+    cursor: pointer;
+    flex: 1;
+    padding: 6px 0;
+    border-radius: 30px;
+    transition: 0.2s;
+}
+.nav-item.active {
+    color: #667eea;
+    background: #eef2ff;
+}
+.item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s;
+}
+.list {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    max-height: 60vh;
+    overflow-y: auto;
+    transition: background 0.2s;
+}
+.setting {
+    background: #f8fafc;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+.setting label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #334155;
+}
+.setting input, .setting select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    font-size: 14px;
+    background: white;
+    transition: background 0.2s, border-color 0.2s;
+}
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal.active {
+    display: flex;
+}
+.modal-content {
+    background: white;
+    padding: 32px;
+    border-radius: 32px;
+    text-align: center;
+    width: 85%;
+    max-width: 320px;
+    transition: background 0.2s;
+}
+.quiz-opt {
+    padding: 14px;
+    background: #f1f5f9;
+    border-radius: 60px;
+    margin-bottom: 12px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.1s;
+}
+.quiz-opt.correct { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+.quiz-opt.wrong { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+.quiz-type-btn {
+    padding: 10px 16px;
+    border-radius: 40px;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+    background: white;
+    font-size: 14px;
+    margin-right: 10px;
+    transition: 0.2s;
+}
+.quiz-type-btn.active {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+.mistake-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fffbeb;
+    transition: background 0.2s;
+}
+.mistake-item button {
+    background: none;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.record-rate {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 6px 0;
+}
+.rate-high { color: #10b981; }
+.rate-medium { color: #f59e0b; }
+.rate-low { color: #ef4444; }
+.login-box, .pwd-box {
+    background: rgba(255,255,255,0.95);
+    border-radius: 32px;
+    padding: 32px 24px;
+    margin: 30px 16px;
+    box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+    backdrop-filter: blur(5px);
+    transition: background 0.2s;
+}
+.login-box h2, .pwd-box h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #667eea;
+    font-size: 26px;
+}
+.login-box input, .pwd-box input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 40px;
+    font-size: 16px;
+    background: white;
+    transition: 0.2s;
+}
+.login-box input:focus, .pwd-box input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+}
+.user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #eef2ff;
+    transition: border-color 0.2s;
+}
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 14px;
+}
+.stat-row span:first-child { color: #475569; }
+.stat-row span:last-child { font-weight: bold; color: #667eea; }
+.login-history {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+    font-size: 13px;
+}
+.login-history div {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* ========== 黑夜模式样式 ========== */
+.dark-mode body {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+}
+.dark-mode .container {
+    background: #0f172a;
+}
+.dark-mode .header {
+    background: linear-gradient(135deg, #1e293b, #334155);
+}
+.dark-mode .card {
+    background: #1e293b;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.dark-mode .card h3 {
+    color: #f1f5f9;
+}
+.dark-mode .stat {
+    background: #1e293b;
+}
+.dark-mode .stat-label {
+    color: #94a3b8;
+}
+.dark-mode .stat-num {
+    color: #818cf8;
+}
+.dark-mode .word {
+    color: #f1f5f9;
+}
+.dark-mode .phonetic {
+    color: #94a3b8;
+}
+.dark-mode .pos {
+    color: #a78bfa;
+}
+.dark-mode .definition {
+    color: #cbd5e1;
+}
+.dark-mode .btn-primary {
+    background: #6366f1;
+}
+.dark-mode .btn-secondary {
+    background: #475569;
+}
+.dark-mode .btn-warning {
+    background: #d97706;
+}
+.dark-mode .btn-danger {
+    background: #dc2626;
+}
+.dark-mode .btn-success {
+    background: #059669;
+}
+.dark-mode .nav {
+    background: #1e293b;
+    border-top-color: #334155;
+}
+.dark-mode .nav-item {
+    color: #94a3b8;
+}
+.dark-mode .nav-item.active {
+    color: #a78bfa;
+    background: #2d3a4e;
+}
+.dark-mode .item {
+    border-bottom-color: #334155;
+    color: #cbd5e1;
+}
+.dark-mode .list {
+    background: #1e293b;
+}
+.dark-mode .setting {
+    background: #0f172a;
+}
+.dark-mode .setting label {
+    color: #cbd5e1;
+}
+.dark-mode .setting input,
+.dark-mode .setting select {
+    background: #1e293b;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+.dark-mode .quiz-opt {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+.dark-mode .quiz-type-btn {
+    background: #1e293b;
+    border-color: #475569;
+    color: #cbd5e1;
+}
+.dark-mode .quiz-type-btn.active {
+    background: #6366f1;
+    border-color: #6366f1;
+    color: white;
+}
+.dark-mode .mistake-item {
+    background: #2d2a1e;
+    border-bottom-color: #475569;
+}
+.dark-mode .login-box,
+.dark-mode .pwd-box {
+    background: rgba(30,41,59,0.95);
+}
+.dark-mode .login-box h2,
+.dark-mode .pwd-box h2 {
+    color: #a78bfa;
+}
+.dark-mode .login-box input,
+.dark-mode .pwd-box input {
+    background: #0f172a;
+    border-color: #334155;
+    color: white;
+}
+.dark-mode .user-item {
+    border-bottom-color: #334155;
+    color: #cbd5e1;
+}
+.dark-mode .stat-row span:first-child {
+    color: #94a3b8;
+}
+.dark-mode .login-history div {
+    border-bottom-color: #334155;
+    color: #cbd5e1;
+}
+.dark-mode .modal-content {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+.dark-mode .modal-content .btn-primary {
+    background: #6366f1;
+}
 </style>
 </head>
 <body>
 <div class="container">
   <!-- 登录页面 -->
   <div id="pageLogin" class="page">
-    <div class="header"><h1>大英赛词汇学习</h1></div>
+    <div class="header">
+      <div class="title-area">
+        <h1>大英赛词汇学习</h1>
+        <button class="dark-mode-toggle" id="loginDarkModeToggle">🌙</button>
+      </div>
+    </div>
     <div class="login-box">
-      <h2>用户登录</h2>
+      <h2>📖 登录学习</h2>
       <input type="text" id="loginUsername" placeholder="用户名">
       <input type="password" id="loginPassword" placeholder="密码">
-      <label style="display:block;margin:10px 0;font-size:14px;color:#666;cursor:pointer">
+      <label style="display:block;margin:10px 0 20px;font-size:14px;cursor:pointer">
         <input type="checkbox" id="rememberPwd" style="vertical-align:middle;margin-right:5px"> 记住密码
       </label>
       <button class="btn btn-primary" id="doLogin">登录</button>
-      <div style="font-size:12px;text-align:center;margin-top:10px;color:#888">管理员初始账号: admin / 123456</div>
+      <div style="font-size:12px;text-align:center;margin-top:20px;color:#64748b">管理员初始账号: admin / 123456</div>
     </div>
   </div>
 
-  <!-- 首次修改密码页面（仅首次登录时显示） -->
+  <!-- 首次修改密码页面 -->
   <div id="pageChangePwd" class="page" style="display:none">
     <div class="header"><h1>修改初始密码</h1></div>
     <div class="pwd-box">
@@ -105,14 +572,19 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
     </div>
   </div>
 
-  <!-- 主应用页面（登录后显示） -->
+  <!-- 主应用页面 -->
   <div id="appContainer" style="display:none">
     <div class="header">
-      <h1>大英赛词汇学习</h1>
+      <div class="title-area">
+        <h1>大英赛词汇学习</h1>
+        <button class="dark-mode-toggle" id="appDarkModeToggle">🌙</button>
+      </div>
       <div class="user-info">
         <span id="currentUserDisplay"></span>
-        <button id="logoutBtn">退出登录</button>
-        <button id="adminPanelBtn" style="display:none">用户管理</button>
+        <div>
+          <button id="logoutBtn">退出登录</button>
+          <button id="adminPanelBtn" style="display:none">管理</button>
+        </div>
       </div>
       <div class="current-vocab" id="currentVocabDisplay"></div>
     </div>
@@ -120,17 +592,17 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
       <div style="padding:15px">
         <div class="stats">
           <div class="stat"><div class="stat-num" id="totalNum">0</div><div class="stat-label">总词汇</div></div>
-          <div class="stat"><div class="stat-num" id="learnedNum">0</div><div class="stat-label">已学习</div></div>
+          <div class="stat"><div class="stat-num" id="learnedNum">0</div><div class="stat-label">已掌握</div></div>
           <div class="stat"><div class="stat-num" id="dailyNum">10</div><div class="stat-label">每日新词</div></div>
         </div>
         <div class="card">
           <h3>今日任务</h3>
-          <button class="btn btn-primary" id="startLearn">开始学习</button>
-          <button class="btn btn-warning" id="startReview" style="margin-top:10px">开始复习</button>
+          <button class="btn btn-primary" id="startLearn">开始学习新词</button>
+          <button class="btn btn-warning" id="startReview" style="margin-top:12px">复习错词本</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <button class="btn btn-secondary" id="toVocab">词库浏览</button>
-          <button class="btn btn-secondary" id="toQuiz">词汇测试</button>
+          <button class="btn btn-secondary" id="toQuiz">词汇测验</button>
           <button class="btn btn-secondary" id="toMistakes">错词本</button>
           <button class="btn btn-secondary" id="toProgress">学习进度</button>
           <button class="btn btn-secondary" id="toSettings">系统设置</button>
@@ -138,212 +610,181 @@ body{font-family:PingFang SC,sans-serif;background:linear-gradient(135deg,#667ee
       </div>
     </div>
 
-    <!-- 学习页面等保持不变 -->
+    <!-- 学习页面 -->
     <div id="pageLearn" class="page">
       <div class="header"><h1>学习模式</h1><p>自动播放发音，再选择</p></div>
-      <div style="padding:15px">
-        <div class="progress"><div class="progress-bar" id="learnBar"></div></div>
-        <div class="card">
-          <div class="word" id="wordText">-</div>
-          <div class="phonetic" id="phoneticText">-</div>
-          <button class="btn btn-primary" id="speakBtn" style="width:auto;padding:12px 30px;margin:10px auto;display:block">手动播放</button>
-          <div class="pos" id="posText"></div>
-          <div class="definition" id="defText"></div>
-          <div class="btns" id="answerBtns">
-            <button class="btn btn-danger" id="btnNo">不认识</button>
-            <button class="btn btn-success" id="btnYes">认识</button>
-          </div>
+      <div class="progress"><div class="progress-bar" id="learnBar"></div></div>
+      <div class="card">
+        <div class="word" id="wordText">-</div>
+        <div class="phonetic" id="phoneticText">-</div>
+        <button class="btn btn-primary" id="speakBtn" style="width:auto;padding:12px 25px;margin:10px auto;display:block">手动播放</button>
+        <div class="pos" id="posText"></div>
+        <div class="definition" id="defText"></div>
+        <div class="btns" id="answerBtns">
+          <button class="btn btn-danger" id="btnNo">不认识</button>
+          <button class="btn btn-success" id="btnYes">认识</button>
         </div>
-        <button class="btn btn-secondary" id="backHome">返回首页</button>
       </div>
+      <button class="btn btn-secondary" id="backHome">返回首页</button>
     </div>
 
+    <!-- 词库浏览 -->
     <div id="pageVocab" class="page">
       <div class="header"><h1>词汇库</h1></div>
-      <div style="padding:15px">
-        <input type="text" id="searchBox" placeholder="搜索单词..." style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-bottom:15px;font-size:16px">
-        <div class="list" id="vocabList"></div>
-      </div>
+      <input type="text" id="searchBox" placeholder="搜索单词或释义..." style="width:100%;padding:12px;border-radius:30px;border:1px solid #e2e8f0;margin-bottom:15px">
+      <div class="list" id="vocabList"></div>
     </div>
 
+    <!-- 测验 -->
     <div id="pageQuiz" class="page">
-      <div class="header"><h1>词汇测试</h1></div>
-      <div style="padding:15px">
-        <div style="margin-bottom:15px">
-          <button class="quiz-type-btn active" id="typeEnToCn">英→中</button>
-          <button class="quiz-type-btn" id="typeCnToEn">中→英</button>
-        </div>
-        <div class="progress"><div class="progress-bar" id="quizBar"></div></div>
-        <div class="card">
-          <div id="quizQuestion"></div>
-          <div id="quizOpts"></div>
-        </div>
+      <div class="header"><h1>词汇测验</h1></div>
+      <div style="margin-bottom:12px">
+        <button class="quiz-type-btn active" id="typeEnToCn">英 → 中</button>
+        <button class="quiz-type-btn" id="typeCnToEn">中 → 英</button>
+      </div>
+      <div class="progress"><div class="progress-bar" id="quizBar"></div></div>
+      <div class="card">
+        <div id="quizQuestion" style="font-size:24px;font-weight:600;"></div>
+        <div id="quizOpts"></div>
       </div>
     </div>
 
+    <!-- 错词本 -->
     <div id="pageMistakes" class="page">
       <div class="header"><h1>错词本</h1><p id="mistakeCount">0 个错词</p></div>
-      <div style="padding:15px">
-        <div class="list" id="mistakeList"></div>
-        <button class="btn btn-secondary" id="backHome3" style="margin-top:15px">返回</button>
-      </div>
+      <div class="list" id="mistakeList"></div>
+      <button class="btn btn-secondary" id="backHome3" style="margin-top:16px">返回</button>
     </div>
 
+    <!-- 学习记录 -->
     <div id="pageRecords" class="page">
       <div class="header"><h1>学习记录</h1></div>
-      <div style="padding:15px">
-        <div class="card">
-          <h3>今日学习</h3>
-          <div id="todayRecords"></div>
-        </div>
-        <div class="card">
-          <h3>最近学习记录</h3>
-          <div id="recentRecords"></div>
-        </div>
-      </div>
+      <div class="card"><h3>今日正确率</h3><div id="todayRecords"></div></div>
+      <div class="card"><h3>最近学习记录</h3><div id="recentRecords"></div></div>
     </div>
 
+    <!-- 进度页面 -->
     <div id="pageProgress" class="page">
       <div class="header"><h1>学习进度</h1></div>
-      <div style="padding:15px">
-        <div class="card">
-          <h3>总体进度</h3>
-          <div class="progress" style="height:12px"><div class="progress-bar" id="progBar"></div></div>
-          <p id="progText">0/0 (0%)</p>
-        </div>
-        <div class="card">
-          <h3>学习时长</h3>
-          <div class="stat-row"><span>累计学习时间：</span><span id="totalDurationDisplay">0 分钟</span></div>
-          <div class="stat-row"><span>本次学习时长：</span><span id="currentDurationDisplay">0 秒</span></div>
-        </div>
-        <div class="card">
-          <h3>最近登录记录</h3>
-          <div id="loginHistoryList" class="login-history"></div>
-        </div>
-        <div class="card">
-          <h3>最近学习记录</h3>
-          <div id="recentRecords2"></div>
-        </div>
+      <div class="card">
+        <h3>总体掌握率</h3>
+        <div class="progress" style="height:12px"><div class="progress-bar" id="progBar"></div></div>
+        <p id="progText" style="margin-top:10px">0/0 (0%)</p>
       </div>
+      <div class="card">
+        <h3>学习时长</h3>
+        <div class="stat-row"><span>累计学习时间：</span><span id="totalDurationDisplay">0 分钟</span></div>
+        <div class="stat-row"><span>本次学习时长：</span><span id="currentDurationDisplay">0 秒</span></div>
+      </div>
+      <div class="card"><h3>最近登录</h3><div id="loginHistoryList"></div></div>
+      <div class="card"><h3>最近学习动态</h3><div id="recentRecords2"></div></div>
     </div>
 
+    <!-- 设置页面（移除了黑夜模式开关，改为全局） -->
     <div id="pageSettings" class="page">
       <div class="header"><h1>系统设置</h1></div>
+      <div class="card">
+        <h3>词汇集管理</h3>
+        <div class="setting">
+          <label>当前词汇集</label>
+          <select id="vocabSetSelect"></select>
+          <button class="btn btn-primary" id="switchVocabBtn" style="margin-top:10px">切换词汇集</button>
+        </div>
+        <div class="setting">
+          <label>导入自定义词汇集 (JSON)</label>
+          <input type="file" id="importFile" accept=".json">
+          <button class="btn btn-warning" id="importVocabBtn" style="margin-top:8px">导入并切换</button>
+          <div style="font-size:12px;color:#64748b;margin-top:6px">格式: [{ "word":"...", "phonetic":"...", "pos":"...", "definition":"..." }]</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>语音朗读设置</h3>
+        <div class="setting">
+          <label style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="autoSpeakCheckbox"> 学习时自动朗读单词
+          </label>
+        </div>
+        <div class="setting">
+          <label>重复次数（1~5）</label>
+          <input type="number" id="speakRepeat" min="1" max="5" value="1">
+        </div>
+        <div class="setting">
+          <label>朗读间隔（毫秒，300~2000）</label>
+          <input type="number" id="speakInterval" min="300" max="2000" step="50" value="500">
+        </div>
+      </div>
+      <div class="card">
+        <h3>修改密码</h3>
+        <div class="setting"><label>当前密码</label><input type="password" id="currentPwd" placeholder="请输入当前密码"></div>
+        <div class="setting"><label>新密码</label><input type="password" id="userNewPwd" placeholder="至少3位"></div>
+        <div class="setting"><label>确认新密码</label><input type="password" id="userConfirmPwd" placeholder="再次输入"></div>
+        <button class="btn btn-warning" id="changePwdBtn">修改密码</button>
+      </div>
+      <div class="card">
+        <h3>学习设置</h3>
+        <div class="setting"><label>每日新词数</label><input type="number" id="setDaily" min="1" max="50"></div>
+        <div class="setting"><label>复习倍数</label><input type="number" id="setReview" min="1" max="10"></div>
+        <div class="setting"><label>测验选项数</label><input type="number" id="setOptions" min="2" max="6"></div>
+        <button class="btn btn-primary" id="saveSet">保存设置</button>
+      </div>
+      <button class="btn btn-secondary" id="backHome2">返回首页</button>
+    </div>
+
+    <!-- 管理员查看用户记录专用页 -->
+    <div id="pageAdminRecords" class="page" style="display:none">
+      <div class="header">
+        <button onclick="showPage('pageAdmin')" style="float:left;background:none;border:none;color:white;font-size:18px">← 返回</button>
+        <h1>用户学习记录</h1>
+      </div>
       <div style="padding:15px">
-        <div class="card">
-          <h3>词汇集管理</h3>
-          <div class="setting">
-            <label>当前词汇集</label>
-            <select id="vocabSetSelect" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px"></select>
-            <button class="btn btn-primary" id="switchVocabBtn" style="margin-top:10px">切换词汇集</button>
-          </div>
-          <div class="setting">
-            <label>导入自定义词汇集 (JSON)</label>
-            <input type="file" id="importFile" accept=".json" style="margin-bottom:10px">
-            <button class="btn btn-warning" id="importVocabBtn">导入并切换</button>
-            <div style="font-size:12px;color:#888;margin-top:5px">JSON格式: [{ "word":"...", "phonetic":"...", "pos":"...", "definition":"..." }]</div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>修改密码</h3>
-          <div class="setting">
-            <label>当前密码</label>
-            <input type="password" id="currentPwd" placeholder="请输入当前密码" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px">
-          </div>
-          <div class="setting">
-            <label>新密码</label>
-            <input type="password" id="userNewPwd" placeholder="请输入新密码" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px">
-          </div>
-          <div class="setting">
-            <label>确认新密码</label>
-            <input type="password" id="userConfirmPwd" placeholder="请再次输入新密码" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px">
-          </div>
-          <button class="btn btn-warning" id="changePwdBtn" style="width:100%">修改密码</button>
-        </div>
-
-        <div class="card">
-          <h3>学习设置</h3>
-          <div class="setting">
-            <label>每日新词数</label>
-            <input type="number" id="setDaily" value="10" min="1" max="50">
-          </div>
-          <div class="setting">
-            <label>复习倍数</label>
-            <input type="number" id="setReview" value="3" min="1" max="10">
-          </div>
-          <div class="setting">
-            <label>测验选项数</label>
-            <input type="number" id="setOptions" value="4" min="2" max="6">
-          </div>
-          <button class="btn btn-primary" id="saveSet" style="margin-top:15px">保存设置</button>
-        </div>
-        <button class="btn btn-secondary" id="backHome2" style="margin-top:10px">返回首页</button>
-      </div>
-    </div>
-
-    <!-- 管理员管理页面 -->
-    <!-- 查看学习记录模态框 -->
-  <div id="pageRecords" class="page" style="display:none">
-    <div class="header">
-      <button onclick="showPage(\'pageAdmin\')" style="float:left;background:none;border:none;color:white;font-size:20px">←返回</button>
-      <h1 id="recordsTitle">学习记录</h1>
-    </div>
-    <div style="padding:15px">
-      <div style="margin-bottom:15px">
-        <select id="recordUserSelect" style="padding:10px;font-size:16px;width:100%;margin-bottom:10px">
+        <select id="recordUserSelect" style="padding:12px;border-radius:30px;width:100%;margin-bottom:12px"></select>
+        <select id="recordTypeSelect" style="padding:12px;border-radius:30px;width:100%;margin-bottom:12px">
+          <option value="all">全部记录</option><option value="login">登录记录</option><option value="learning">学习记录</option>
         </select>
-        <select id="recordTypeSelect" style="padding:10px;font-size:16px;width:100%;margin-bottom:10px">
-          <option value="all">全部记录</option>
-          <option value="login">登录记录</option>
-          <option value="learning">学习记录</option>
-        </select>
-        <button id="queryRecordsBtn" class="btn btn-primary" style="width:100%">查询</button>
-      </div>
-      <div id="recordsContent" style="background:white;padding:10px;border-radius:8px;max-height:400px;overflow-y:auto">
+        <button id="queryRecordsBtn" class="btn btn-primary">查询</button>
+        <div id="recordsContent" style="background:white;border-radius:20px;padding:12px;margin-top:16px;max-height:400px;overflow-y:auto"></div>
       </div>
     </div>
-  </div>
 
-  <div id="pageAdmin" class="page">
+    <!-- 管理员用户管理页面 -->
+    <div id="pageAdmin" class="page">
       <div class="header"><h1>用户管理</h1></div>
-      <div style="padding:15px">
-        <div class="card">
-          <h3>添加新用户</h3>
-          <input type="text" id="newUserName" placeholder="用户名" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px">
-          <input type="password" id="newUserPwd" placeholder="密码" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px">
-          <button class="btn btn-primary" id="addUserBtn">添加用户</button>
-        </div>
-        <div class="card">
-          <h3>现有用户</h3>
-          <div id="userList" class="user-list"></div>
-        </div>
-        <button class="btn btn-info" id="viewRecordsBtn" style="margin-top:15px">查看学习记录</button>
-        <button class="btn btn-secondary" id="backHomeAdmin" style="margin-top:15px">返回首页</button>
+      <div class="card">
+        <h3>添加新用户</h3>
+        <input type="text" id="newUserName" placeholder="用户名" style="margin-bottom:10px;width:100%;padding:12px;border-radius:40px;border:1px solid #e2e8f0">
+        <input type="password" id="newUserPwd" placeholder="初始密码" style="margin-bottom:10px;width:100%;padding:12px;border-radius:40px">
+        <button class="btn btn-primary" id="addUserBtn">添加用户</button>
       </div>
+      <div class="card">
+        <h3>现有用户</h3>
+        <div id="userList" class="user-list"></div>
+      </div>
+      <button class="btn btn-info" id="viewRecordsBtn">查看学习记录</button>
+      <button class="btn btn-secondary" id="backHomeAdmin" style="margin-top:15px">返回首页</button>
     </div>
 
     <div class="nav" id="navBar">
-      <div class="nav-item active" data-page="pageHome">首页</div>
-      <div class="nav-item" data-page="pageVocab">词库</div>
-      <div class="nav-item" data-page="pageRecords">记录</div>
-      <div class="nav-item" data-page="pageSettings">设置</div>
+      <div class="nav-item" data-page="pageHome">🏠 首页</div>
+      <div class="nav-item" data-page="pageVocab">📖 词库</div>
+      <div class="nav-item" data-page="pageRecords">📊 记录</div>
+      <div class="nav-item" data-page="pageSettings">⚙️ 设置</div>
     </div>
   </div>
 </div>
 
 <div class="modal" id="completeModal">
   <div class="modal-content">
-    <div style="font-size:40px;margin-bottom:15px">完成!</div>
-    <div style="font-size:24px;font-weight:bold;margin:15px 0" id="rateText">0%</div>
+    <div style="font-size:40px">🎉 完成!</div>
+    <div style="font-size:26px;font-weight:bold;margin:15px 0" id="rateText">0%</div>
     <p id="rateDetail">正确: 0/0</p>
-    <button class="btn btn-primary" id="closeModal">返回</button>
+    <button class="btn btn-primary" id="closeModal">关闭</button>
   </div>
 </div>
 
 <script>
 // ==================== 预定义词汇集 ====================
 var defaultVocabSets = {
-  "大英赛高频词汇": [
+      "大英赛高频词汇": [
     { "word": "abandon", "phonetic": "/əˈbændən/", "pos": "v..", "definition": "放弃" },
     { "word": "ability", "phonetic": "/əˈbɪləti/", "pos": "n..", "definition": "能力" },
     { "word": "able", "phonetic": "/ˈeɪbl/", "pos": "adj..", "definition": "能干的" },
@@ -37111,14 +37552,10 @@ var defaultVocabSets = {
 
 // 加载或初始化词汇集存储
 function loadVocabSets() {
-  // 优先从localStorage加载，如果不存在则使用默认词汇
   var saved = localStorage.getItem('vocabSets');
-  if (saved) {
-    return JSON.parse(saved);
-  } else {
-    localStorage.setItem('vocabSets', JSON.stringify(defaultVocabSets));
-    return JSON.parse(JSON.stringify(defaultVocabSets));
-  }
+  if (saved) return JSON.parse(saved);
+  localStorage.setItem('vocabSets', JSON.stringify(defaultVocabSets));
+  return JSON.parse(JSON.stringify(defaultVocabSets));
 }
 function saveVocabSets(sets) {
   localStorage.setItem('vocabSets', JSON.stringify(sets));
@@ -37129,23 +37566,30 @@ var currentUser = null;
 var currentUserInfo = null;
 var sessionStartTime = null;
 var durationTimer = null;
-var currentVocabName = null;     // 当前词汇集名称
-var currentVocab = null;         // 当前词汇数组
-var allVocabSets = null;         // 所有词汇集
+var currentVocabName = null;
+var currentVocab = null;
+var allVocabSets = null;
 
-// 存储键名前缀（用户+词汇集）
+// 存储键名前缀
 function userVocabKey(prefix) {
   return prefix + '_' + currentUser + '_' + currentVocabName;
 }
 function getSet() {
-  if (!currentUser || !currentVocabName) return {daily:10,review:3,options:3};
+  if (!currentUser || !currentVocabName) return {daily:10, review:3, options:3, autoSpeak:false, speakRepeat:1, speakInterval:500};
   var s = localStorage.getItem(userVocabKey('settings'));
-  return s ? JSON.parse(s) : {daily:10,review:3,options:3};
+  var def = {daily:10, review:3, options:3, autoSpeak:false, speakRepeat:1, speakInterval:500};
+  if (s) {
+    var obj = JSON.parse(s);
+    for (var key in def) if (obj[key] === undefined) obj[key] = def[key];
+    return obj;
+  }
+  return def;
 }
 function setSet(s) {
   if (!currentUser || !currentVocabName) return;
   localStorage.setItem(userVocabKey('settings'), JSON.stringify(s));
 }
+
 function getRecords() {
   if (!currentUser || !currentVocabName) return [];
   var r = localStorage.getItem(userVocabKey('records'));
@@ -37153,7 +37597,7 @@ function getRecords() {
 }
 function saveRecords(records) {
   if (!currentUser || !currentVocabName) return;
-  localStorage.setItem(userVocabKey('records'), JSON.stringify(records));
+  localStorage.setItem(userVocabKey('records'), JSON.stringify(records.slice(-150)));
 }
 function getMistakes() {
   if (!currentUser || !currentVocabName) return {};
@@ -37174,7 +37618,6 @@ function saveLearnedWords(set) {
   localStorage.setItem(userVocabKey('learnedWords'), JSON.stringify([...set]));
 }
 
-// 辅助函数
 function updateLearnedCount() {
   document.getElementById("learnedNum").textContent = getLearnedWords().size;
   document.getElementById("totalNum").textContent = currentVocab.length;
@@ -37186,7 +37629,7 @@ function addRecord(word, known) {
   var records = getRecords();
   var today = new Date().toISOString().split("T")[0];
   records.push({word:word, known:known, date:today, time:new Date().toISOString()});
-  if (records.length > 100) records = records.slice(-100);
+  if (records.length > 150) records = records.slice(-150);
   saveRecords(records);
   updateLearnedCount();
 }
@@ -37205,114 +37648,19 @@ function removeMistake(word) {
   }
 }
 
-// 登录历史与时长记录（保持与之前相同）
-function recordLogin(username) {
-  var users = loadUsers();
-  var user = users[username];
-  if (!user) return;
-  user.loginHistory = user.loginHistory || [];
-  user.loginHistory.unshift({ time: new Date().toISOString(), type: 'login' });
-  if (user.loginHistory.length > 50) user.loginHistory.pop();
-  saveUsers(users);
-}
-
-// 记录学习活动
-function recordLearning(action, details) {
-  var users = loadUsers();
-  var user = users[currentUser];
-  if (!user || !currentUser) return;
-  user.learningHistory = user.learningHistory || [];
-  user.learningHistory.unshift({
-    time: new Date().toISOString(),
-    action: action,
-    details: details || ''
-  });
-  if (user.learningHistory.length > 100) user.learningHistory.pop();
-  saveUsers(users);
-}
-
-// 获取用户学习记录
-function getUserLearningHistory(username) {
-  var users = loadUsers();
-  return users[username] ? (users[username].learningHistory || []) : [];
-}
-
-// 获取用户登录历史
-function getUserLoginHistory(username) {
-  var users = loadUsers();
-  return users[username] ? (users[username].loginHistory || []) : [];
-}
-function updateTotalDuration(seconds) {
-  if (!currentUser) return;
-  var users = loadUsers();
-  var user = users[currentUser];
-  if (!user) return;
-  user.totalDuration += seconds;
-  saveUsers(users);
-}
-function getCurrentDuration() {
-  if (!sessionStartTime) return 0;
-  return Math.floor((Date.now() - sessionStartTime) / 1000);
-}
-function startDurationTimer() {
-  if (durationTimer) clearInterval(durationTimer);
-  durationTimer = setInterval(() => {
-    if (document.getElementById("pageProgress").classList.contains("active")) {
-      var sec = getCurrentDuration();
-      document.getElementById("currentDurationDisplay").textContent = sec + " 秒";
-    }
-  }, 1000);
-}
-function stopDurationTimer() {
-  if (durationTimer) clearInterval(durationTimer);
-  durationTimer = null;
-}
-function renderLoginHistoryAndDuration() {
-  var users = loadUsers();
-  var user = users[currentUser];
-  var totalSec = user.totalDuration;
-  var totalMinutes = Math.floor(totalSec / 60);
-  document.getElementById("totalDurationDisplay").textContent = totalMinutes + " 分钟";
-  var currentSec = getCurrentDuration();
-  document.getElementById("currentDurationDisplay").textContent = currentSec + " 秒";
-  var historyHtml = "";
-  for (var i = 0; i < user.loginHistory.length; i++) {
-    var date = new Date(user.loginHistory[i].time);
-    historyHtml += "<div>" + date.toLocaleString() + "</div>";
-  }
-  if (!historyHtml) historyHtml = "<div>暂无登录记录</div>";
-  document.getElementById("loginHistoryList").innerHTML = historyHtml;
-}
-
-// 用户系统函数（与之前相同）
+// 用户管理函数
 function loadUsers() {
   var u = localStorage.getItem('users');
   if (u) {
-    // 用户已存在，保留现有用户数据不重置
     var users = JSON.parse(u);
-    // 如果admin用户不存在，则创建
     if (!users["admin"]) {
-      users["admin"] = {
-        password: btoa("123456"),
-        isAdmin: true,
-        mustChangePwd: true,
-        loginHistory: [],
-        totalDuration: 0,
-        lastVocab: "英语六级词汇"
-      };
+      users["admin"] = {password: btoa("123456"), isAdmin: true, mustChangePwd: true, loginHistory: [], totalDuration: 0, lastVocab: "大英赛高频词汇"};
       localStorage.setItem('users', JSON.stringify(users));
     }
     return users;
   } else {
     var defaultUsers = {
-      "admin": {
-        password: btoa("123456"),
-        isAdmin: true,
-        mustChangePwd: true,
-        loginHistory: [],
-        totalDuration: 0,
-        lastVocab: "大英赛高频词汇"  // 记录用户最后使用的词汇集
-      }
+      "admin": {password: btoa("123456"), isAdmin: true, mustChangePwd: true, loginHistory: [], totalDuration: 0, lastVocab: "大英赛高频词汇"}
     };
     localStorage.setItem('users', JSON.stringify(defaultUsers));
     return defaultUsers;
@@ -37323,143 +37671,338 @@ function saveUsers(users) {
 }
 function encrypt(pwd) { return btoa(pwd); }
 function checkPassword(input, stored) { return encrypt(input) === stored; }
-
-function changePassword(newPwd) {
+function recordLogin(username) {
   var users = loadUsers();
-  users[currentUser].password = encrypt(newPwd);
-  users[currentUser].mustChangePwd = false;
-  saveUsers(users);
-  currentUserInfo = users[currentUser];
-  loadMainApp();
+  if (users[username]) {
+    users[username].loginHistory = users[username].loginHistory || [];
+    users[username].loginHistory.unshift({time: new Date().toISOString(), type: 'login'});
+    if (users[username].loginHistory.length > 50) users[username].loginHistory.pop();
+    saveUsers(users);
+  }
 }
-
-function login(username, password) {
+function recordLearning(action, details) {
+  if (!currentUser) return;
   var users = loadUsers();
-  if (!users[username]) { alert("用户名不存在"); return false; }
-  var user = users[username];
-  if (!checkPassword(password, user.password)) { alert("密码错误"); return false; }
-  currentUser = username;
-  currentUserInfo = user;
-  localStorage.setItem('currentUser', username);
-  recordLogin(username);
-  if (user.mustChangePwd) {
-    document.getElementById("pageLogin").style.display = "none";
-    document.getElementById("pageChangePwd").style.display = "block";
-    document.getElementById("pageChangePwd").classList.add("active");
-    return true;
-  }
-  loadMainApp();
-  return true;
-}
-function logout() {
-  if (sessionStartTime) {
-    var seconds = Math.floor((Date.now() - sessionStartTime) / 1000);
-    if (seconds > 0) updateTotalDuration(seconds);
-    sessionStartTime = null;
-  }
-  stopDurationTimer();
-  window.removeEventListener('beforeunload', recordCurrentSession);
-  currentUser = null;
-  currentUserInfo = null;
-  localStorage.removeItem('currentUser');
-  // 清除记住的密码
-  localStorage.removeItem('savedUsername');
-  localStorage.removeItem('savedPassword');
-  document.getElementById("loginUsername").value = "";
-  document.getElementById("loginPassword").value = "";
-  document.getElementById("rememberPwd").checked = false;
-  document.getElementById("appContainer").style.display = "none";
-  document.getElementById("pageLogin").style.display = "block";
-  document.getElementById("pageLogin").classList.add("active");
-  document.getElementById("pageChangePwd").style.display = "none";
-}
-function recordCurrentSession() {
-  if (sessionStartTime) {
-    var seconds = Math.floor((Date.now() - sessionStartTime) / 1000);
-    if (seconds > 0) updateTotalDuration(seconds);
+  if (users[currentUser]) {
+    users[currentUser].learningHistory = users[currentUser].learningHistory || [];
+    users[currentUser].learningHistory.unshift({time: new Date().toISOString(), action: action, details: details});
+    if (users[currentUser].learningHistory.length > 100) users[currentUser].learningHistory.pop();
+    saveUsers(users);
   }
 }
-function autoLogin() {
-  var savedUser = localStorage.getItem('currentUser');
-  if (savedUser) {
-    var users = loadUsers();
-    if (users[savedUser]) {
-      currentUser = savedUser;
-      currentUserInfo = users[savedUser];
-      if (currentUserInfo.mustChangePwd) {
-        document.getElementById("pageLogin").style.display = "none";
-        document.getElementById("pageChangePwd").style.display = "block";
-        document.getElementById("pageChangePwd").classList.add("active");
-        return true;
-      }
-      loadMainApp();
-      return true;
+function updateTotalDuration(seconds) {
+  if (!currentUser) return;
+  var users = loadUsers();
+  if (users[currentUser]) {
+    users[currentUser].totalDuration += seconds;
+    saveUsers(users);
+  }
+}
+function getCurrentDuration() {
+  if (!sessionStartTime) return 0;
+  return Math.floor((Date.now() - sessionStartTime) / 1000);
+}
+function startDurationTimer() {
+  if (durationTimer) clearInterval(durationTimer);
+  durationTimer = setInterval(() => {
+    if (document.getElementById("pageProgress").classList.contains("active")) {
+      document.getElementById("currentDurationDisplay").textContent = getCurrentDuration() + " 秒";
     }
-  }
-  return false;
+  }, 1000);
 }
-
-// 管理员功能
-function addUser(username, password) {
-  var users = loadUsers();
-  if (users[username]) { alert("用户名已存在"); return false; }
-  users[username] = {
-    password: encrypt(password),
-    isAdmin: false,
-    mustChangePwd: false,
-    loginHistory: [],
-    totalDuration: 0,
-    lastVocab: "大英赛高频词汇"
-  };
-  saveUsers(users);
-  renderUserList();
-  alert("用户添加成功");
-  return true;
+function stopDurationTimer() {
+  if (durationTimer) clearInterval(durationTimer);
+  durationTimer = null;
 }
-function deleteUser(username) {
-  if (username === currentUser) { alert("不能删除自己"); return false; }
+function renderLoginHistoryAndDuration() {
   var users = loadUsers();
-  if (!users[username]) return false;
-  delete users[username];
-  saveUsers(users);
-  // 删除该用户的所有数据（不同词汇集的数据也会被删除，但保留词汇集本身）
-  var keysToRemove = [];
-  for (var i = 0; i < localStorage.length; i++) {
-    var key = localStorage.key(i);
-    if (key.startsWith('settings_') || key.startsWith('records_') || key.startsWith('mistakes_') || key.startsWith('learnedWords_')) {
-      if (key.includes('_' + username + '_')) keysToRemove.push(key);
-    }
-  }
-  keysToRemove.forEach(k => localStorage.removeItem(k));
-  renderUserList();
-  alert("用户已删除");
-  return true;
-}
-function resetPassword(username) {
-  if (username === currentUser) { alert("不能重置自己的密码，请使用修改密码功能"); return false; }
-  var users = loadUsers();
-  if (!users[username]) return false;
-  users[username].password = encrypt("123456");
-  users[username].mustChangePwd = true;
-  saveUsers(users);
-  alert("用户 " + username + " 的密码已重置为 123456，该用户下次登录需修改密码");
-  renderUserList();
-  return true;
-}
-function renderUserList() {
-  var users = loadUsers();
+  var user = users[currentUser];
+  var totalSec = user.totalDuration || 0;
+  document.getElementById("totalDurationDisplay").textContent = Math.floor(totalSec / 60) + " 分钟";
+  document.getElementById("currentDurationDisplay").textContent = getCurrentDuration() + " 秒";
   var html = "";
-  for (var u in users) {
-    var isAdmin = users[u].isAdmin ? "(管理员)" : "";
-    html += `<div class="user-item">
-                <span>${u} ${isAdmin}</span>
-                <div>
-                  ${!users[u].isAdmin ? `<button class="btn btn-warning" onclick="resetPassword('${u}')" style="margin-right:5px">重置密码</button>` : ''}
-                  ${!users[u].isAdmin ? `<button class="btn btn-danger" onclick="deleteUser('${u}')">删除</button>` : ''}
-                </div>
-              </div>`;
+  (user.loginHistory || []).forEach(function(entry) {
+    html += "<div>" + new Date(entry.time).toLocaleString() + "</div>";
+  });
+  document.getElementById("loginHistoryList").innerHTML = html || "<div>暂无登录记录</div>";
+}
+
+// 自动朗读相关变量
+var currentSpeechTimeouts = [];
+var currentSpeechActive = false;
+function cancelAutoSpeak() {
+  currentSpeechTimeouts.forEach(t => clearTimeout(t));
+  currentSpeechTimeouts = [];
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
   }
-  document.getElementById("userList").innerHTML = html;
+  currentSpeechActive = false;
+}
+function startAutoSpeak(word, timesLeft, interval) {
+  if (!currentSpeechActive) return;
+  if (window.speechSynthesis) {
+    try {
+      var utter = new SpeechSynthesisUtterance(word);
+      utter.lang = "en-US";
+      utter.rate = 0.9;
+      window.speechSynthesis.speak(utter);
+    } catch(e) { console.error("语音播放失败", e); }
+  }
+  if (timesLeft > 1) {
+    var tid = setTimeout(function() {
+      startAutoSpeak(word, timesLeft - 1, interval);
+    }, interval);
+    currentSpeechTimeouts.push(tid);
+  }
+}
+function scheduleAutoSpeak(word) {
+  cancelAutoSpeak();
+  var settings = getSet();
+  if (!settings.autoSpeak) return;
+  currentSpeechActive = true;
+  var repeat = settings.speakRepeat || 1;
+  var interval = settings.speakInterval || 500;
+  if (repeat > 0) {
+    startAutoSpeak(word, repeat, interval);
+  }
+}
+
+// 学习模式相关
+var curWords = [], curIdx = 0, correct = 0, total = 0;
+var isLearningProcessing = false;
+var autoPlayTimer = null;
+
+function displayCurrentWord() {
+  if (curIdx >= curWords.length) {
+    var r = total > 0 ? Math.round(correct / total * 100) : 0;
+    document.getElementById("rateText").textContent = r + "%";
+    document.getElementById("rateDetail").textContent = "正确: " + correct + "/" + total;
+    document.getElementById("completeModal").classList.add("active");
+    return;
+  }
+  var w = curWords[curIdx];
+  document.getElementById("wordText").textContent = w.word;
+  document.getElementById("phoneticText").textContent = w.phonetic || "";
+  document.getElementById("posText").textContent = w.pos || "";
+  document.getElementById("defText").classList.remove("show");
+  document.getElementById("answerBtns").classList.remove("show");
+  document.getElementById("learnBar").style.width = (curIdx / curWords.length * 100) + "%";
+  scheduleAutoSpeak(w.word);
+  if (autoPlayTimer) clearTimeout(autoPlayTimer);
+  autoPlayTimer = setTimeout(function() {
+    document.getElementById("answerBtns").classList.add("show");
+    autoPlayTimer = null;
+  }, 3000);
+}
+
+function playCurrentWord() {
+  var w = curWords[curIdx];
+  if (w) {
+    cancelAutoSpeak();
+    if (window.speechSynthesis) {
+      try {
+        var utter = new SpeechSynthesisUtterance(w.word);
+        utter.lang = "en-US";
+        utter.rate = 0.9;
+        window.speechSynthesis.speak(utter);
+      } catch(e) { console.error("语音播放失败", e); }
+    }
+  }
+}
+
+function doAnswer(known) {
+  if (isLearningProcessing) return;
+  isLearningProcessing = true;
+  cancelAutoSpeak();
+  if (autoPlayTimer) clearTimeout(autoPlayTimer);
+  autoPlayTimer = null;
+  var w = curWords[curIdx];
+  total++;
+  if (known) correct++;
+  addRecord(w.word, known);
+  if (known) removeMistake(w.word);
+  else addMistake(w.word);
+  document.getElementById("defText").textContent = w.definition;
+  document.getElementById("defText").classList.add("show");
+  setTimeout(function() {
+    curIdx++;
+    displayCurrentWord();
+    isLearningProcessing = false;
+  }, 3000);
+}
+
+function startLearn() {
+  var s = getSet();
+  var cnt = s.daily;
+  var unlearned = currentVocab.filter(v => !getLearnedWords().has(v.word));
+  if (unlearned.length === 0) unlearned = currentVocab.slice();
+  var shuffled = unlearned.slice();
+  for (var i = shuffled.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  curWords = shuffled.slice(0, cnt);
+  curIdx = 0; correct = 0; total = 0;
+  showPage("pageLearn");
+  displayCurrentWord();
+}
+function startReview() {
+  var mistakes = getMistakes();
+  var mistakeWords = Object.keys(mistakes);
+  if (mistakeWords.length === 0) { alert("错词本为空，无法复习"); return; }
+  var s = getSet();
+  var reviewCount = s.daily * s.review;
+  if (reviewCount > mistakeWords.length) reviewCount = mistakeWords.length;
+  var shuffled = mistakeWords.slice();
+  for (var i = shuffled.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  var selectedWords = shuffled.slice(0, reviewCount);
+  curWords = selectedWords.map(word => currentVocab.find(v => v.word === word)).filter(v => v);
+  curIdx = 0; correct = 0; total = 0;
+  showPage("pageLearn");
+  displayCurrentWord();
+}
+
+// 测验模式
+var quizType = 'en2cn';
+function startQuiz() {
+  var s = getSet();
+  var cnt = s.daily;
+  var opt = s.options;
+  var shuffled = currentVocab.slice();
+  for (var i = shuffled.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  curWords = shuffled.slice(0, cnt);
+  curIdx = 0; correct = 0; total = 0;
+  showPage("pageQuiz");
+  showQuiz(opt);
+}
+function showQuiz(opt) {
+  if (curIdx >= curWords.length) {
+    var r = total > 0 ? Math.round(correct / total * 100) : 0;
+    document.getElementById("rateText").textContent = r + "%";
+    document.getElementById("rateDetail").textContent = "正确: " + correct + "/" + total;
+    document.getElementById("completeModal").classList.add("active");
+    return;
+  }
+  var w = curWords[curIdx];
+  var isEn2Cn = (quizType === 'en2cn');
+  var question = isEn2Cn ? w.word : w.definition;
+  var correctAnswer = isEn2Cn ? w.definition : w.word;
+  document.getElementById("quizQuestion").textContent = question;
+  var opts = [correctAnswer];
+  while (opts.length < opt) {
+    var rand = currentVocab[Math.floor(Math.random() * currentVocab.length)];
+    var cand = isEn2Cn ? rand.definition : rand.word;
+    if (opts.indexOf(cand) === -1) opts.push(cand);
+  }
+  opts.sort(() => Math.random() - 0.5);
+  var html = "";
+  for (var i = 0; i < opts.length; i++) html += "<div class='quiz-opt' data-value='" + opts[i].replace(/'/g, "\\'") + "'>" + opts[i] + "</div>";
+  document.getElementById("quizOpts").innerHTML = html;
+  document.getElementById("quizBar").style.width = (curIdx / curWords.length * 100) + "%";
+  var container = document.getElementById("quizOpts");
+  var newDiv = container.cloneNode(true);
+  container.parentNode.replaceChild(newDiv, container);
+  newDiv.id = "quizOpts";
+  newDiv.onclick = function(e) {
+    if (isQuizProcessing) return;
+    if (e.target.classList.contains("quiz-opt")) {
+      isQuizProcessing = true;
+      var selected = e.target.getAttribute("data-value");
+      if (selected === correctAnswer) {
+        correct++; total++;
+        e.target.classList.add("correct");
+        removeMistake(w.word);
+      } else {
+        total++;
+        e.target.classList.add("wrong");
+        var allOpts = document.querySelectorAll(".quiz-opt");
+        for (var i = 0; i < allOpts.length; i++) {
+          if (allOpts[i].getAttribute("data-value") === correctAnswer) allOpts[i].classList.add("correct");
+        }
+        addMistake(w.word);
+      }
+      setTimeout(function() {
+        curIdx++;
+        isQuizProcessing = false;
+        showQuiz(opt);
+      }, 1500);
+    }
+  };
+}
+var isQuizProcessing = false;
+
+// 页面切换和渲染
+function showPage(id) {
+  document.querySelectorAll("#appContainer .page").forEach(p => p.classList.remove("active"));
+  var target = document.getElementById(id);
+  if (target) target.classList.add("active");
+  document.querySelectorAll('#appContainer .nav-item').forEach(nav => {
+    nav.classList.remove('active');
+    if (nav.dataset.page === id) nav.classList.add('active');
+  });
+  if (id === "pageRecords") renderRecords();
+  if (id === "pageProgress") { renderProgress(); renderLoginHistoryAndDuration(); }
+  if (id === "pageMistakes") renderMistakes();
+  if (id === "pageVocab") renderVocab();
+}
+function renderVocab() {
+  var f = document.getElementById("searchBox").value.toLowerCase();
+  var filtered = currentVocab.filter(v => v.word.toLowerCase().includes(f) || v.definition.includes(f));
+  var html = "";
+  for (var i = 0; i < filtered.length; i++) {
+    html += "<div class='item'><span>" + filtered[i].word + "</span><span style='color:#888'>" + filtered[i].definition + "</span></div>";
+  }
+  document.getElementById("vocabList").innerHTML = html || "<div style='padding:15px;text-align:center'>无匹配单词</div>";
+}
+function renderMistakes() {
+  var mistakes = getMistakes();
+  var words = Object.keys(mistakes);
+  document.getElementById("mistakeCount").textContent = words.length + " 个错词";
+  var html = "";
+  for (var i = 0; i < words.length; i++) {
+    var w = words[i];
+    html += "<div class='mistake-item'><span>" + w + "</span><button class='remove-mistake' data-word='" + w + "'>✔️ 掌握移除</button></div>";
+  }
+  if (!html) html = "<div style='padding:15px;color:#888;text-align:center'>错词本为空</div>";
+  document.getElementById("mistakeList").innerHTML = html;
+  document.querySelectorAll('.remove-mistake').forEach(btn => {
+    btn.onclick = function() {
+      var word = this.dataset.word;
+      removeMistake(word);
+      renderMistakes();
+      alert("已从错词本移除 " + word);
+    };
+  });
+}
+function renderRecords() {
+  var records = getRecords();
+  var today = new Date().toISOString().split("T")[0];
+  var todayRecords = records.filter(r => r.date === today);
+  var todayCorrect = todayRecords.filter(r => r.known).length;
+  var rate = todayRecords.length ? Math.round(todayCorrect / todayRecords.length * 100) : 0;
+  var rateClass = rate >= 80 ? "rate-high" : (rate >= 60 ? "rate-medium" : "rate-low");
+  document.getElementById("todayRecords").innerHTML = "<div class='record-item'><div class='record-rate " + rateClass + "'>" + rate + "%</div><div>正确: " + todayCorrect + "/" + todayRecords.length + "</div></div>";
+  var recentHtml = "";
+  var recent = records.slice(-20).reverse();
+  for (var i = 0; i < recent.length; i++) {
+    var r = recent[i];
+    recentHtml += "<div class='item'><span>" + r.word + "</span>" + (r.known ? "✅" : "❌") + "</div>";
+  }
+  if (!recentHtml) recentHtml = "<div style='padding:15px;text-align:center'>暂无学习记录</div>";
+  document.getElementById("recentRecords").innerHTML = recentHtml;
+  document.getElementById("recentRecords2").innerHTML = recentHtml;
+}
+function renderProgress() {
+  var count = getLearnedWords().size;
+  var pct = Math.round(count / currentVocab.length * 100);
+  document.getElementById("progBar").style.width = pct + "%";
+  document.getElementById("progText").textContent = count + "/" + currentVocab.length + " (" + pct + "%)";
 }
 
 // 词汇集管理
@@ -37475,25 +38018,28 @@ function refreshVocabSelect() {
   }
 }
 function switchVocab(newName) {
-  if (!allVocabSets[newName]) {
-    alert("词汇集不存在");
-    return false;
+  if (!allVocabSets[newName]) { alert("词汇集不存在"); return false; }
+  if (curWords && curIdx < curWords.length) {
+    if (!confirm("当前有未完成的学习/测验，切换将丢失进度，确定吗？")) return false;
+    cancelAutoSpeak();
+    if (autoPlayTimer) clearTimeout(autoPlayTimer);
+    autoPlayTimer = null;
+    isLearningProcessing = false;
+    isQuizProcessing = false;
+    curWords = [];
+    curIdx = 0;
   }
-  // 保存当前用户使用的词汇集
   var users = loadUsers();
   users[currentUser].lastVocab = newName;
   saveUsers(users);
-  // 更新全局
   currentVocabName = newName;
   currentVocab = allVocabSets[newName];
   document.getElementById("currentVocabDisplay").textContent = "当前词汇集：" + newName;
-  // 刷新界面数据
   updateLearnedCount();
   renderVocab();
   renderProgress();
   renderRecords();
   renderMistakes();
-  // 刷新设置页的选项显示
   refreshVocabSelect();
   alert("已切换到词汇集：" + newName);
   return true;
@@ -37502,14 +38048,12 @@ function importVocab(jsonData, setName) {
   try {
     var newVocab = JSON.parse(jsonData);
     if (!Array.isArray(newVocab)) throw new Error("不是数组");
-    // 验证每个条目是否包含必要字段
     for (var i = 0; i < newVocab.length; i++) {
       var item = newVocab[i];
       if (!item.word || !item.definition) throw new Error("第" + (i+1) + "个单词缺少word或definition字段");
       if (!item.phonetic) item.phonetic = "";
       if (!item.pos) item.pos = "";
     }
-    // 确保名称唯一
     var finalName = setName;
     var suffix = 1;
     while (allVocabSets[finalName]) {
@@ -37519,7 +38063,6 @@ function importVocab(jsonData, setName) {
     allVocabSets[finalName] = newVocab;
     saveVocabSets(allVocabSets);
     refreshVocabSelect();
-    // 询问是否立即切换
     if (confirm("词汇集导入成功，是否立即切换到该词汇集？")) {
       switchVocab(finalName);
     } else {
@@ -37532,465 +38075,64 @@ function importVocab(jsonData, setName) {
   }
 }
 
-// 页面切换和渲染函数
-function showPage(id) {
-  document.querySelectorAll("#appContainer .page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  if (id === "pageRecords") renderRecords();
-  if (id === "pageProgress") {
-    renderProgress();
-    renderLoginHistoryAndDuration();
-  }
-  if (id === "pageMistakes") renderMistakes();
-  if (id === "pageVocab") renderVocab();
-  document.querySelectorAll('#appContainer .nav-item').forEach(nav => {
-    nav.classList.remove('active');
-    if (nav.dataset.page === id) nav.classList.add('active');
-  });
-}
-
-function renderVocab() {
-  var f = document.getElementById("searchBox").value;
-  var ws = currentVocab.filter(v => v.word.indexOf(f) !== -1 || v.definition.indexOf(f) !== -1);
-  var html = "";
-  for (var i = 0; i < ws.length; i++) {
-    html += "<div class='item'><span>" + ws[i].word + "</span><span style='color:#888'>" + ws[i].definition + "</span></div>";
-  }
-  document.getElementById("vocabList").innerHTML = html;
-}
-
-function renderMistakes() {
-  var mistakes = getMistakes();
-  var words = Object.keys(mistakes);
-  document.getElementById("mistakeCount").textContent = words.length + " 个错词";
-  var html = "";
-  for (var i = 0; i < words.length; i++) {
-    var w = words[i];
-    html += "<div class='mistake-item'><span>" + w + "</span><span style='color:#d9534f'>需要复习</span></div>";
-  }
-  if (!html) html = "<div style='padding:15px;color:#888;text-align:center'>错词本为空</div>";
-  document.getElementById("mistakeList").innerHTML = html;
-}
-
-function renderRecords() {
-  var records = getRecords();
-  var today = new Date().toISOString().split("T")[0];
-  var todayRecords = records.filter(r => r.date === today);
-  var todayHtml = "";
-  if (todayRecords.length === 0) {
-    todayHtml = "<div style='padding:15px;color:#888;text-align:center'>今日暂无学习记录</div>";
-  } else {
-    var todayCorrect = todayRecords.filter(r => r.known).length;
-    var todayTotal = todayRecords.length;
-    var todayRate = todayTotal > 0 ? Math.round(todayCorrect / todayTotal * 100) : 0;
-    todayHtml = "<div class='record-item'><div class='record-date'>今日学习</div><div class='record-rate " + getRateClass(todayRate) + "'>" + todayRate + "%</div><div class='record-detail'>正确: " + todayCorrect + "/" + todayTotal + "</div></div>";
-  }
-  document.getElementById("todayRecords").innerHTML = todayHtml;
-  var recentHtml = "";
-  var recent = records.slice(-20).reverse();
-  for (var i = 0; i < recent.length; i++) {
-    var r = recent[i];
-    var status = r.known ? '<span style="color:#5cb85c">认识</span>' : '<span style="color:#d9534f">不认识</span>';
-    recentHtml += "<div class='item'><span>" + r.word + "</span>" + status + "</div>";
-  }
-  if (!recentHtml) recentHtml = "<div style='padding:15px;color:#888;text-align:center'>暂无学习记录</div>";
-  document.getElementById("recentRecords").innerHTML = recentHtml;
-  document.getElementById("recentRecords2").innerHTML = recentHtml;
-}
-
-function renderProgress() {
-  var records = getRecords();
-  var recentHtml = "";
-  var recent = records.slice(-20).reverse();
-  for (var i = 0; i < recent.length; i++) {
-    var r = recent[i];
-    var status = r.known ? '<span style="color:#5cb85c">认识</span>' : '<span style="color:#d9534f">不认识</span>';
-    recentHtml += "<div class='item'><span>" + r.word + "</span>" + status + "</div>";
-  }
-  if (!recentHtml) recentHtml = "<div style='padding:15px;color:#888;text-align:center'>暂无学习记录</div>";
-  document.getElementById("recentRecords2").innerHTML = recentHtml;
-  var count = getLearnedWords().size;
-  var pct = Math.round(count / currentVocab.length * 100);
-  document.getElementById("progBar").style.width = pct + "%";
-  document.getElementById("progText").textContent = count + "/" + currentVocab.length + " (" + pct + "%)";
-}
-
-function getRateClass(rate) {
-  if (rate >= 80) return "rate-high";
-  if (rate >= 60) return "rate-medium";
-  return "rate-low";
-}
-
-// 学习功能（与原相同，使用 currentVocab）
-var curWords = [], curIdx = 0, correct = 0, total = 0;
-var quizType = 'en2cn';
-var daily = 10;
-var isLearningProcessing = false;
-var isQuizProcessing = false;
-var autoPlayTimer = null;
-
-function showWord() {
-  if (curIdx >= curWords.length) {
-    var r = total > 0 ? Math.round(correct / total * 100) : 0;
-    document.getElementById("rateText").textContent = r + "%";
-    document.getElementById("rateDetail").textContent = "正确: " + correct + "/" + total;
-    document.getElementById("completeModal").classList.add("active");
-    return;
-  }
-  var w = curWords[curIdx];
-  document.getElementById("wordText").textContent = w.word;
-  document.getElementById("phoneticText").textContent = w.phonetic;
-  document.getElementById("posText").textContent = w.pos;
-  document.getElementById("defText").classList.remove("show");
-  document.getElementById("answerBtns").classList.remove("show");
-  document.getElementById("learnBar").style.width = (curIdx / curWords.length * 100) + "%";
-  if (autoPlayTimer) clearTimeout(autoPlayTimer);
-  autoPlayTimer = setTimeout(() => {
-    playCurrentWord();
-    document.getElementById("answerBtns").classList.add("show");
-    autoPlayTimer = null;
-  }, 3000);
-}
-function playCurrentWord() {
-  var w = curWords[curIdx];
-  if (window.speechSynthesis) {
-    try {
-      var utt = new SpeechSynthesisUtterance(w.word);
-      utt.lang = "en-US"; utt.rate = 0.8;
-      window.speechSynthesis.speak(utt);
-    } catch(e) { console.error("语音播放失败", e); }
-  }
-}
-function doAnswer(known) {
-  if (isLearningProcessing) return;
-  isLearningProcessing = true;
-  var w = curWords[curIdx];
-  total++;
-  if (known) correct++;
-  addRecord(w.word, known);
-  if (known) removeMistake(w.word);
-  else addMistake(w.word);
-  document.getElementById("defText").textContent = w.definition;
-  document.getElementById("defText").classList.add("show");
-  setTimeout(() => {
-    curIdx++;
-    showWord();
-    isLearningProcessing = false;
-  }, 3000);
-}
-function showQuiz(opt) {
-  if (curIdx >= curWords.length) {
-    var r = total > 0 ? Math.round(correct / total * 100) : 0;
-    document.getElementById("rateText").textContent = r + "%";
-    document.getElementById("rateDetail").textContent = "正确: " + correct + "/" + total;
-    document.getElementById("completeModal").classList.add("active");
-    return;
-  }
-  var w = curWords[curIdx];
-  document.getElementById("quizBar").style.width = (curIdx / curWords.length * 100) + "%";
-  var isEn2Cn = quizType === 'en2cn';
-  var question = isEn2Cn ? w.word : w.definition;
-  var correctAnswer = isEn2Cn ? w.definition : w.word;
-  document.getElementById("quizQuestion").textContent = question;
-  var opts = [correctAnswer];
-  while (opts.length < opt) {
-    var r = currentVocab[Math.floor(Math.random() * currentVocab.length)];
-    var candidate = isEn2Cn ? r.definition : r.word;
-    if (opts.indexOf(candidate) === -1) opts.push(candidate);
-  }
-  opts.sort(() => Math.random() - 0.5);
-  var html = "";
-  for (var i = 0; i < opts.length; i++) html += "<div class='quiz-opt' data='" + opts[i] + "'>" + opts[i] + "</div>";
-  var container = document.getElementById("quizOpts");
-  container.innerHTML = html;
-  var newDiv = container.cloneNode(true);
-  container.parentNode.replaceChild(newDiv, container);
-  newDiv.id = "quizOpts";
-  newDiv.onclick = function(e) {
-    if (isQuizProcessing) return;
-    if (e.target.classList.contains("quiz-opt")) {
-      isQuizProcessing = true;
-      if (e.target.getAttribute("data") === correctAnswer) {
-        correct++; total++;
-        e.target.classList.add("correct");
-        removeMistake(w.word);
-      } else {
-        total++;
-        e.target.classList.add("wrong");
-        var allOpts = document.querySelectorAll(".quiz-opt");
-        for (var i = 0; i < allOpts.length; i++) {
-          if (allOpts[i].getAttribute("data") === correctAnswer) allOpts[i].classList.add("correct");
-        }
-        addMistake(w.word);
-      }
-      setTimeout(() => { curIdx++; isQuizProcessing = false; showQuiz(opt); }, 1500);
-    }
-  };
-}
-function startQuiz() {
-  var s = getSet();
-  var cnt = s.daily;
-  var opt = s.options;
-  curWords = [];
-  var used = {};
-  while (curWords.length < cnt && curWords.length < currentVocab.length) {
-    var idx = Math.floor(Math.random() * currentVocab.length);
-    if (!used[idx]) { used[idx] = true; curWords.push(currentVocab[idx]); }
-  }
-  curIdx = 0; correct = 0; total = 0;
-  showPage("pageQuiz");
-  showQuiz(opt);
-}
-
-// 加载主应用（登录后）
-function loadMainApp() {
-  allVocabSets = loadVocabSets();
-  // 获取用户上次使用的词汇集，若无则使用默认
+// 管理员功能
+function renderUserList() {
   var users = loadUsers();
-  var lastVocab = users[currentUser].lastVocab;
-  if (!lastVocab || !allVocabSets[lastVocab]) {
-    lastVocab = Object.keys(allVocabSets)[0];
+  var html = "";
+  for (var u in users) {
+    var isAdmin = users[u].isAdmin ? "(管理员)" : "";
+    html += `<div class="user-item">
+                <span>${u} ${isAdmin}</span>
+                <div>
+                  ${!users[u].isAdmin ? `<button class="btn btn-warning" onclick="resetUserPwd('${u}')" style="margin-right:5px">重置密码</button>` : ''}
+                  ${!users[u].isAdmin ? `<button class="btn btn-danger" onclick="deleteUser('${u}')">删除</button>` : ''}
+                </div>
+              </div>`;
   }
-  currentVocabName = lastVocab;
-  currentVocab = allVocabSets[currentVocabName];
-  document.getElementById("currentVocabDisplay").textContent = "当前词汇集：" + currentVocabName;
-  document.getElementById("appContainer").style.display = "block";
-  document.getElementById("pageLogin").style.display = "none";
-  document.getElementById("pageChangePwd").style.display = "none";
-  document.getElementById("currentUserDisplay").textContent = currentUser;
-  var s = getSet();
-  daily = s.daily;
-  document.getElementById("dailyNum").textContent = daily;
-  document.getElementById("setDaily").value = s.daily;
-  document.getElementById("setReview").value = s.review;
-  document.getElementById("setOptions").value = s.options;
-  updateLearnedCount();
-  showPage("pageHome");
-  // 管理员按钮
-  var adminBtn = document.getElementById("adminPanelBtn");
-  if (currentUserInfo.isAdmin) {
-    adminBtn.style.display = "inline-block";
-  } else {
-    adminBtn.style.display = "none";
-  }
-  // 导航事件
-  document.querySelectorAll('#appContainer .nav-item').forEach(item => {
-    item.removeEventListener('click', navClickHandler);
-    item.addEventListener('click', navClickHandler);
-  });
-  function navClickHandler(e) {
-    var pageId = e.currentTarget.dataset.page;
-    if (pageId) showPage(pageId);
-  }
-  // 计时
-  sessionStartTime = Date.now();
-  startDurationTimer();
-  window.addEventListener('beforeunload', recordCurrentSession);
-  // 刷新词汇集下拉列表
-  refreshVocabSelect();
+  document.getElementById("userList").innerHTML = html;
 }
-
-// 绑定事件
-function bindEvents() {
-  document.getElementById("saveSet").onclick = () => {
-    var s = {daily:parseInt(document.getElementById("setDaily").value)||10, review:parseInt(document.getElementById("setReview").value)||3, options:parseInt(document.getElementById("setOptions").value)||4};
-    setSet(s);
-    daily = s.daily;
-    document.getElementById("dailyNum").textContent = s.daily;
-    alert("设置已保存");
-  };
-  document.getElementById("toVocab").onclick = () => { showPage("pageVocab"); renderVocab(); };
-  document.getElementById("toQuiz").onclick = () => startQuiz();
-  document.getElementById("toMistakes").onclick = () => { showPage("pageMistakes"); renderMistakes(); };
-  document.getElementById("toProgress").onclick = () => showPage("pageProgress");
-  document.getElementById("toSettings").onclick = () => showPage("pageSettings");
-  document.getElementById("backHome").onclick = () => showPage("pageHome");
-  document.getElementById("backHome2").onclick = () => showPage("pageHome");
-  document.getElementById("backHome3").onclick = () => showPage("pageHome");
-  document.getElementById("closeModal").onclick = () => { document.getElementById("completeModal").classList.remove("active"); showPage("pageHome"); };
-  document.getElementById("typeEnToCn").onclick = () => { quizType = 'en2cn'; startQuiz(); };
-  document.getElementById("typeCnToEn").onclick = () => { quizType = 'cn2en'; startQuiz(); };
-  document.getElementById("startLearn").onclick = () => {
-    var s = getSet();
-    var cnt = s.daily;
-    curWords = [];
-    var used = {};
-    while (curWords.length < cnt && curWords.length < currentVocab.length) {
-      var idx = Math.floor(Math.random() * currentVocab.length);
-      if (!used[idx]) { used[idx] = true; curWords.push(currentVocab[idx]); }
-    }
-    curIdx = 0; correct = 0; total = 0;
-    showPage("pageLearn");
-    showWord();
-  };
-  document.getElementById("startReview").onclick = () => {
-    var mistakes = getMistakes();
-    var mistakeWords = Object.keys(mistakes);
-    if (mistakeWords.length === 0) { alert("错词本为空，无法复习"); return; }
-    var s = getSet();
-    var reviewCount = s.daily * s.review;
-    if (reviewCount > mistakeWords.length) reviewCount = mistakeWords.length;
-    var shuffled = mistakeWords.slice();
-    for (var i = shuffled.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    var selectedWords = shuffled.slice(0, reviewCount);
-    curWords = selectedWords.map(word => currentVocab.find(v => v.word === word)).filter(v => v);
-    if (curWords.length === 0) { alert("无法获取错词详情"); return; }
-    curIdx = 0; correct = 0; total = 0;
-    showPage("pageLearn");
-    showWord();
-  };
-  document.getElementById("speakBtn").onclick = () => {
-    if (autoPlayTimer) {
-      clearTimeout(autoPlayTimer);
-      autoPlayTimer = null;
-    }
-    playCurrentWord();
-    document.getElementById("answerBtns").classList.add("show");
-  };
-  document.getElementById("btnNo").onclick = () => doAnswer(false);
-  document.getElementById("btnYes").onclick = () => doAnswer(true);
-  document.getElementById("searchBox").oninput = renderVocab;
-
-  // 词汇集切换
-  document.getElementById("switchVocabBtn").onclick = () => {
-    var select = document.getElementById("vocabSetSelect");
-    var newName = select.value;
-    if (newName && newName !== currentVocabName) {
-      switchVocab(newName);
-    } else {
-      alert("请选择不同的词汇集");
-    }
-  };
-  // 导入词汇
-  document.getElementById("importVocabBtn").onclick = () => {
-    var fileInput = document.getElementById("importFile");
-    if (!fileInput.files || fileInput.files.length === 0) {
-      alert("请先选择JSON文件");
-      return;
-    }
-    var file = fileInput.files[0];
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var content = e.target.result;
-      var name = prompt("请输入词汇集名称（例如：雅思核心）", "我的词汇集");
-      if (!name) return;
-      importVocab(content, name);
-    };
-    reader.readAsText(file);
-  };
-  // 管理员面板
-  document.getElementById("adminPanelBtn").onclick = () => {
-    renderUserList();
-    showPage("pageAdmin");
-  };
-  // 管理员查看学习记录按钮
-  document.getElementById("viewRecordsBtn").onclick = () => {
-    showRecordsPage();
-  };
-  
-  // 用户修改密码按钮
-  document.getElementById("changePwdBtn").onclick = () => {
-    var currentPwd = document.getElementById("currentPwd").value;
-    var newPwd = document.getElementById("userNewPwd").value;
-    var confirmPwd = document.getElementById("userConfirmPwd").value;
-    
-    if (!currentPwd || !newPwd || !confirmPwd) {
-      alert("请填写所有密码字段");
-      return;
-    }
-    if (newPwd !== confirmPwd) {
-      alert("两次输入的新密码不一致");
-      return;
-    }
-    if (newPwd.length < 3) {
-      alert("新密码长度至少3个字符");
-      return;
-    }
-    
+window.resetUserPwd = function(username) {
+  if (username === currentUser) { alert("不能重置自己的密码"); return; }
+  var users = loadUsers();
+  users[username].password = encrypt("123456");
+  users[username].mustChangePwd = true;
+  saveUsers(users);
+  renderUserList();
+  alert("用户 " + username + " 的密码已重置为 123456");
+};
+window.deleteUser = function(username) {
+  if (username === currentUser) { alert("不能删除自己"); return; }
+  if (confirm("确定删除用户 " + username + " 吗？其所有学习数据将被清除")) {
     var users = loadUsers();
-    var user = users[currentUser];
-    if (!checkPassword(currentPwd, user.password)) {
-      alert("当前密码错误");
-      return;
-    }
-    
-    // 更新密码
-    user.password = encrypt(newPwd);
-    user.mustChangePwd = false;
+    delete users[username];
     saveUsers(users);
-    
-    alert("密码修改成功");
-    document.getElementById("currentPwd").value = "";
-    document.getElementById("userNewPwd").value = "";
-    document.getElementById("userConfirmPwd").value = "";
-  };
-  
-  document.getElementById("backHomeAdmin").onclick = () => showPage("pageHome");
-  document.getElementById("addUserBtn").onclick = () => {
-    var un = document.getElementById("newUserName").value.trim();
-    var pwd = document.getElementById("newUserPwd").value;
-    if (un && pwd) addUser(un, pwd);
-    else alert("请输入用户名和密码");
-    document.getElementById("newUserName").value = "";
-    document.getElementById("newUserPwd").value = "";
-  };
-}
-
-// 初始化登录界面
-function init() {
-  document.getElementById("appContainer").style.display = "none";
-  document.getElementById("pageLogin").style.display = "block";
-  document.getElementById("pageLogin").classList.add("active");
-  document.getElementById("pageChangePwd").style.display = "none";
-  if (!autoLogin()) {
-    // 无自动登录，显示登录界面
+    var keysToRemove = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key.includes('_' + username + '_')) keysToRemove.push(key);
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    renderUserList();
+    alert("用户已删除");
   }
-  document.getElementById("doLogin").onclick = () => {
-    var un = document.getElementById("loginUsername").value.trim();
-    var pwd = document.getElementById("loginPassword").value;
-    var remember = document.getElementById("rememberPwd").checked;
-    if (un && pwd) {
-      // 保存密码功能
-      if (remember) {
-        localStorage.setItem('savedUsername', un);
-        localStorage.setItem('savedPassword', btoa(pwd));
-      } else {
-        localStorage.removeItem('savedUsername');
-        localStorage.removeItem('savedPassword');
-      }
-      login(un, pwd);
-    } else {
-      alert("请输入用户名和密码");
-    }
+};
+function addUser(un, pwd) {
+  var users = loadUsers();
+  if (users[un]) { alert("用户名已存在"); return false; }
+  users[un] = {
+    password: encrypt(pwd),
+    isAdmin: false,
+    mustChangePwd: false,
+    loginHistory: [],
+    totalDuration: 0,
+    lastVocab: currentVocabName
   };
-  
-  // 页面加载时自动填充已保存的账号密码
-  (function() {
-    var savedUser = localStorage.getItem('savedUsername');
-    var savedPwd = localStorage.getItem('savedPassword');
-    if (savedUser) document.getElementById("loginUsername").value = savedUser;
-    if (savedPwd) {
-      document.getElementById("loginPassword").value = atob(savedPwd);
-      document.getElementById("rememberPwd").checked = true;
-    }
-  })();
-  document.getElementById("confirmChangePwd").onclick = () => {
-    var pwd1 = document.getElementById("newPwd").value;
-    var pwd2 = document.getElementById("confirmPwd").value;
-    if (!pwd1 || pwd1 !== pwd2) {
-      alert("密码不能为空且两次输入必须一致");
-      return;
-    }
-    changePassword(pwd1);
-  };
-  document.getElementById("logoutBtn").onclick = logout;
-  bindEvents();
+  saveUsers(users);
+  renderUserList();
+  alert("用户添加成功");
+  return true;
 }
-// 显示学习记录页面
-function showRecordsPage() {
+function showAdminRecords() {
   var users = loadUsers();
   var select = document.getElementById("recordUserSelect");
   select.innerHTML = "";
@@ -38001,52 +38143,278 @@ function showRecordsPage() {
     select.appendChild(opt);
   }
   document.getElementById("recordTypeSelect").value = "all";
-  document.getElementById("recordsContent").innerHTML = "<p style=\'text-align:center;color:#888\'>点击查询按钮查看记录</p>";
-  showPage("pageRecords");
+  document.getElementById("recordsContent").innerHTML = "<p style='text-align:center;color:#888'>点击查询按钮查看记录</p>";
+  showPage("pageAdminRecords");
 }
-
-// 查询记录
 function queryRecords() {
   var username = document.getElementById("recordUserSelect").value;
   var recordType = document.getElementById("recordTypeSelect").value;
   var users = loadUsers();
   var user = users[username];
   if (!user) return;
-  
   var records = [];
   if (recordType === "all" || recordType === "login") {
-    var loginHist = user.loginHistory || [];
-    loginHist.forEach(function(r) {
-      records.push({time: r.time, type: "登录", detail: new Date(r.time).toLocaleString()});
+    (user.loginHistory || []).forEach(function(l) {
+      records.push({time: l.time, type: "登录", detail: new Date(l.time).toLocaleString()});
     });
   }
   if (recordType === "all" || recordType === "learning") {
-    var learnHist = user.learningHistory || [];
-    learnHist.forEach(function(r) {
-      records.push({time: r.time, type: r.action === 'answer' ? '答题' : '学习', detail: r.details});
+    (user.learningHistory || []).forEach(function(l) {
+      records.push({time: l.time, type: "学习", detail: l.details || l.action});
     });
   }
-  
-  // 按时间排序
-  records.sort(function(a, b) { return new Date(b.time) - new Date(a.time); });
-  
+  records.sort(function(a,b) { return new Date(b.time) - new Date(a.time); });
   var html = "";
-  if (records.length === 0) {
-    html = "<p style=\'text-align:center;color:#888\'>暂无记录</p>";
-  } else {
-    records.forEach(function(r) {
-      html += "<div style=\'padding:10px;border-bottom:1px solid #eee\'>";
-      html += "<div style=\'color:#667eea;font-weight:bold\'>" + r.type + "</div>";
-      html += "<div style=\'color:#888;font-size:12px\'>" + new Date(r.time).toLocaleString() + "</div>";
-      if (r.detail) html += "<div style=\'margin-top:5px\'>" + r.detail + "</div>";
-      html += "</div>";
-    });
-  }
-  
-  document.getElementById("recordsContent").innerHTML = html;
+  records.forEach(function(r) {
+    html += "<div style='padding:8px;border-bottom:1px solid #eee'><b>" + r.type + "</b><div style='color:#666;font-size:12px'>" + new Date(r.time).toLocaleString() + "</div>" + (r.detail ? "<div>" + r.detail + "</div>" : "") + "</div>";
+  });
+  document.getElementById("recordsContent").innerHTML = html || "<p style='text-align:center;color:#888'>暂无记录</p>";
 }
 
-init();
+// 黑夜模式管理
+function applyDarkMode(isDark) {
+  if (isDark) {
+    document.documentElement.classList.add('dark-mode');
+  } else {
+    document.documentElement.classList.remove('dark-mode');
+  }
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+  // 更新所有切换按钮的图标
+  var toggleBtns = document.querySelectorAll('.dark-mode-toggle');
+  toggleBtns.forEach(btn => {
+    btn.textContent = isDark ? '☀️' : '🌙';
+  });
+}
+function initDarkMode() {
+  var saved = localStorage.getItem('darkMode');
+  var isDark = (saved === '1');
+  applyDarkMode(isDark);
+}
+function toggleDarkMode() {
+  var isDark = document.documentElement.classList.contains('dark-mode');
+  applyDarkMode(!isDark);
+}
+
+// 登录退出主流程
+function login(username, password) {
+  var users = loadUsers();
+  if (!users[username]) { alert("用户名不存在"); return false; }
+  if (!checkPassword(password, users[username].password)) { alert("密码错误"); return false; }
+  currentUser = username;
+  currentUserInfo = users[username];
+  localStorage.setItem('currentUser', username);
+  recordLogin(username);
+  if (users[username].mustChangePwd) {
+    document.getElementById("pageLogin").style.display = "none";
+    document.getElementById("pageChangePwd").style.display = "block";
+    document.getElementById("pageChangePwd").classList.add("active");
+    return true;
+  }
+  loadMainApp();
+  return true;
+}
+function logout() {
+  if (sessionStartTime) {
+    var seconds = getCurrentDuration();
+    if (seconds > 0) updateTotalDuration(seconds);
+  }
+  stopDurationTimer();
+  cancelAutoSpeak();
+  if (autoPlayTimer) clearTimeout(autoPlayTimer);
+  currentUser = null;
+  currentUserInfo = null;
+  localStorage.removeItem('currentUser');
+  document.getElementById("appContainer").style.display = "none";
+  document.getElementById("pageLogin").style.display = "block";
+  document.getElementById("pageLogin").classList.add("active");
+  document.getElementById("pageChangePwd").style.display = "none";
+  curWords = [];
+  curIdx = 0;
+}
+function changePassword(newPwd) {
+  var users = loadUsers();
+  users[currentUser].password = encrypt(newPwd);
+  users[currentUser].mustChangePwd = false;
+  saveUsers(users);
+  currentUserInfo = users[currentUser];
+  loadMainApp();
+}
+function loadMainApp() {
+  allVocabSets = loadVocabSets();
+  var users = loadUsers();
+  var lastVocab = users[currentUser].lastVocab;
+  if (!lastVocab || !allVocabSets[lastVocab]) lastVocab = Object.keys(allVocabSets)[0];
+  currentVocabName = lastVocab;
+  currentVocab = allVocabSets[currentVocabName];
+  document.getElementById("currentVocabDisplay").textContent = "当前词汇集：" + currentVocabName;
+  document.getElementById("appContainer").style.display = "block";
+  document.getElementById("pageLogin").style.display = "none";
+  document.getElementById("pageChangePwd").style.display = "none";
+  document.getElementById("currentUserDisplay").textContent = currentUser;
+  var s = getSet();
+  document.getElementById("dailyNum").textContent = s.daily;
+  document.getElementById("setDaily").value = s.daily;
+  document.getElementById("setReview").value = s.review;
+  document.getElementById("setOptions").value = s.options;
+  document.getElementById("autoSpeakCheckbox").checked = s.autoSpeak;
+  document.getElementById("speakRepeat").value = s.speakRepeat;
+  document.getElementById("speakInterval").value = s.speakInterval;
+  // 黑夜模式初始化
+  initDarkMode();
+  updateLearnedCount();
+  showPage("pageHome");
+  document.getElementById("adminPanelBtn").style.display = currentUserInfo.isAdmin ? "inline-block" : "none";
+  sessionStartTime = Date.now();
+  startDurationTimer();
+  window.addEventListener('beforeunload', function() {
+    if (sessionStartTime) {
+      var sec = getCurrentDuration();
+      if (sec > 0) updateTotalDuration(sec);
+    }
+  });
+  refreshVocabSelect();
+}
+
+// 初始化登录和事件绑定
+function initLogin() {
+  document.getElementById("appContainer").style.display = "none";
+  document.getElementById("pageLogin").style.display = "block";
+  document.getElementById("pageLogin").classList.add("active");
+  document.getElementById("pageChangePwd").style.display = "none";
+  var savedUser = localStorage.getItem('savedUsername');
+  var savedPwd = localStorage.getItem('savedPassword');
+  if (savedUser) document.getElementById("loginUsername").value = savedUser;
+  if (savedPwd) {
+    document.getElementById("loginPassword").value = atob(savedPwd);
+    document.getElementById("rememberPwd").checked = true;
+  }
+  // 登录页切换按钮
+  document.getElementById("loginDarkModeToggle").onclick = function() {
+    toggleDarkMode();
+  };
+  document.getElementById("doLogin").onclick = function() {
+    var un = document.getElementById("loginUsername").value.trim();
+    var pwd = document.getElementById("loginPassword").value;
+    var remember = document.getElementById("rememberPwd").checked;
+    if (remember) {
+      localStorage.setItem('savedUsername', un);
+      localStorage.setItem('savedPassword', btoa(pwd));
+    } else {
+      localStorage.removeItem('savedUsername');
+      localStorage.removeItem('savedPassword');
+    }
+    login(un, pwd);
+  };
+  document.getElementById("confirmChangePwd").onclick = function() {
+    var pwd1 = document.getElementById("newPwd").value;
+    var pwd2 = document.getElementById("confirmPwd").value;
+    if (!pwd1 || pwd1 !== pwd2) {
+      alert("密码不能为空且两次输入必须一致");
+      return;
+    }
+    changePassword(pwd1);
+  };
+  document.getElementById("logoutBtn").onclick = logout;
+  if (localStorage.getItem('currentUser')) {
+    var users = loadUsers();
+    var u = localStorage.getItem('currentUser');
+    if (users[u] && !users[u].mustChangePwd) loadMainApp();
+    else if (users[u] && users[u].mustChangePwd) {
+      document.getElementById("pageLogin").style.display = "none";
+      document.getElementById("pageChangePwd").style.display = "block";
+      document.getElementById("pageChangePwd").classList.add("active");
+    }
+  }
+}
+
+function bindEvents() {
+  document.getElementById("saveSet").onclick = function() {
+    var s = {
+      daily: parseInt(document.getElementById("setDaily").value) || 10,
+      review: parseInt(document.getElementById("setReview").value) || 3,
+      options: parseInt(document.getElementById("setOptions").value) || 4,
+      autoSpeak: document.getElementById("autoSpeakCheckbox").checked,
+      speakRepeat: parseInt(document.getElementById("speakRepeat").value) || 1,
+      speakInterval: parseInt(document.getElementById("speakInterval").value) || 500
+    };
+    if (s.speakRepeat < 1) s.speakRepeat = 1;
+    if (s.speakRepeat > 5) s.speakRepeat = 5;
+    if (s.speakInterval < 300) s.speakInterval = 300;
+    if (s.speakInterval > 2000) s.speakInterval = 2000;
+    setSet(s);
+    document.getElementById("dailyNum").textContent = s.daily;
+    alert("设置已保存");
+  };
+  document.getElementById("toVocab").onclick = function() { showPage("pageVocab"); renderVocab(); };
+  document.getElementById("toQuiz").onclick = function() { startQuiz(); };
+  document.getElementById("toMistakes").onclick = function() { showPage("pageMistakes"); renderMistakes(); };
+  document.getElementById("toProgress").onclick = function() { showPage("pageProgress"); };
+  document.getElementById("toSettings").onclick = function() { showPage("pageSettings"); };
+  document.getElementById("backHome").onclick = function() { showPage("pageHome"); };
+  document.getElementById("backHome2").onclick = function() { showPage("pageHome"); };
+  document.getElementById("backHome3").onclick = function() { showPage("pageHome"); };
+  document.getElementById("closeModal").onclick = function() { document.getElementById("completeModal").classList.remove("active"); showPage("pageHome"); };
+  document.getElementById("typeEnToCn").onclick = function() { quizType = 'en2cn'; document.querySelectorAll(".quiz-type-btn").forEach(b=>b.classList.remove("active")); document.getElementById("typeEnToCn").classList.add("active"); startQuiz(); };
+  document.getElementById("typeCnToEn").onclick = function() { quizType = 'cn2en'; document.querySelectorAll(".quiz-type-btn").forEach(b=>b.classList.remove("active")); document.getElementById("typeCnToEn").classList.add("active"); startQuiz(); };
+  document.getElementById("startLearn").onclick = startLearn;
+  document.getElementById("startReview").onclick = startReview;
+  document.getElementById("speakBtn").onclick = playCurrentWord;
+  document.getElementById("btnNo").onclick = function() { doAnswer(false); };
+  document.getElementById("btnYes").onclick = function() { doAnswer(true); };
+  document.getElementById("searchBox").oninput = renderVocab;
+  document.getElementById("switchVocabBtn").onclick = function() {
+    var newName = document.getElementById("vocabSetSelect").value;
+    if (newName && newName !== currentVocabName) switchVocab(newName);
+    else alert("请选择不同的词汇集");
+  };
+  document.getElementById("importVocabBtn").onclick = function() {
+    var file = document.getElementById("importFile").files[0];
+    if (!file) { alert("请先选择JSON文件"); return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var name = prompt("请输入词汇集名称", "我的词汇集");
+      if (name) importVocab(e.target.result, name);
+    };
+    reader.readAsText(file);
+  };
+  document.getElementById("adminPanelBtn").onclick = function() { renderUserList(); showPage("pageAdmin"); };
+  document.getElementById("viewRecordsBtn").onclick = function() { showAdminRecords(); };
+  document.getElementById("queryRecordsBtn").onclick = queryRecords;
+  document.getElementById("addUserBtn").onclick = function() {
+    var un = document.getElementById("newUserName").value.trim();
+    var pwd = document.getElementById("newUserPwd").value;
+    if (un && pwd) addUser(un, pwd);
+    else alert("请输入用户名和密码");
+    document.getElementById("newUserName").value = "";
+    document.getElementById("newUserPwd").value = "";
+  };
+  document.getElementById("backHomeAdmin").onclick = function() { showPage("pageHome"); };
+  document.getElementById("changePwdBtn").onclick = function() {
+    var old = document.getElementById("currentPwd").value;
+    var new1 = document.getElementById("userNewPwd").value;
+    var new2 = document.getElementById("userConfirmPwd").value;
+    if (!old || !new1 || !new2) { alert("请填写所有密码字段"); return; }
+    if (new1 !== new2) { alert("两次输入的新密码不一致"); return; }
+    if (new1.length < 3) { alert("新密码长度至少3个字符"); return; }
+    var users = loadUsers();
+    if (!checkPassword(old, users[currentUser].password)) { alert("当前密码错误"); return; }
+    users[currentUser].password = encrypt(new1);
+    users[currentUser].mustChangePwd = false;
+    saveUsers(users);
+    alert("密码修改成功");
+    document.getElementById("currentPwd").value = "";
+    document.getElementById("userNewPwd").value = "";
+    document.getElementById("userConfirmPwd").value = "";
+  };
+  // 主应用黑夜模式切换按钮
+  document.getElementById("appDarkModeToggle").onclick = function() {
+    toggleDarkMode();
+  };
+}
+
+// 启动
+initLogin();
+bindEvents();
 </script>
 </body>
 </html>
