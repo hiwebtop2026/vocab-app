@@ -404,7 +404,7 @@ body {
     border-bottom: 1px solid #f0f0f0;
 }
 
-/* ========== 黑夜模式样式 ========== */
+/* ========== 黑夜模式样式（增强测验对比度） ========== */
 .dark-mode body {
     background: linear-gradient(135deg, #1e293b, #0f172a);
 }
@@ -487,9 +487,26 @@ body {
     border-color: #475569;
     color: #f1f5f9;
 }
+/* 测验选项 - 增强对比度 */
 .dark-mode .quiz-opt {
-    background: #1e293b;
+    background: #2d3a4e;
+    border: 1px solid #475569;
     color: #f1f5f9;
+    font-weight: 500;
+}
+.dark-mode .quiz-opt:hover {
+    background: #3b4a62;
+    transform: scale(0.98);
+}
+.dark-mode .quiz-opt.correct {
+    background: #065f46;
+    border-color: #10b981;
+    color: white;
+}
+.dark-mode .quiz-opt.wrong {
+    background: #991b1b;
+    border-color: #ef4444;
+    color: white;
 }
 .dark-mode .quiz-type-btn {
     background: #1e293b;
@@ -784,7 +801,7 @@ body {
 <script>
 // ==================== 预定义词汇集 ====================
 var defaultVocabSets = {
-      "大英赛高频词汇": [
+"大英赛高频词汇": [
     { "word": "abandon", "phonetic": "/əˈbændən/", "pos": "v..", "definition": "放弃" },
     { "word": "ability", "phonetic": "/əˈbɪləti/", "pos": "n..", "definition": "能力" },
     { "word": "able", "phonetic": "/ˈeɪbl/", "pos": "adj..", "definition": "能干的" },
@@ -3640,7 +3657,7 @@ var defaultVocabSets = {
     { "word": "zone", "phonetic": "/zoʊn/", "pos": "n..", "definition": "区域" },
     { "word": "zoo", "phonetic": "/zuː/", "pos": "n..", "definition": "动物园" }
   ],
-  "英语六级词汇": [
+   "英语六级词汇": [
   {
     "word": "abandonment",
     "phonetic": "",
@@ -38179,7 +38196,6 @@ function applyDarkMode(isDark) {
     document.documentElement.classList.remove('dark-mode');
   }
   localStorage.setItem('darkMode', isDark ? '1' : '0');
-  // 更新所有切换按钮的图标
   var toggleBtns = document.querySelectorAll('.dark-mode-toggle');
   toggleBtns.forEach(btn => {
     btn.textContent = isDark ? '☀️' : '🌙';
@@ -38259,7 +38275,6 @@ function loadMainApp() {
   document.getElementById("autoSpeakCheckbox").checked = s.autoSpeak;
   document.getElementById("speakRepeat").value = s.speakRepeat;
   document.getElementById("speakInterval").value = s.speakInterval;
-  // 黑夜模式初始化
   initDarkMode();
   updateLearnedCount();
   showPage("pageHome");
@@ -38288,7 +38303,6 @@ function initLogin() {
     document.getElementById("loginPassword").value = atob(savedPwd);
     document.getElementById("rememberPwd").checked = true;
   }
-  // 登录页切换按钮
   document.getElementById("loginDarkModeToggle").onclick = function() {
     toggleDarkMode();
   };
@@ -38406,7 +38420,6 @@ function bindEvents() {
     document.getElementById("userNewPwd").value = "";
     document.getElementById("userConfirmPwd").value = "";
   };
-  // 主应用黑夜模式切换按钮
   document.getElementById("appDarkModeToggle").onclick = function() {
     toggleDarkMode();
   };
